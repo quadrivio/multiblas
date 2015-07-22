@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4C5761DA1B45E3B500CEB763 /* libclBLAS.2.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */; };
+		4C7A884A1B50867100DF3799 /* crossprod_d.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4C55152A1B4749F600F20289 /* crossprod_d.cl */; };
+		4C7A884B1B50867100DF3799 /* crossprod_f.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4C55152B1B4749F600F20289 /* crossprod_f.cl */; };
+		4C8CF12D1B41BE9E00573C31 /* multiblas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C8CF12B1B41BE9E00573C31 /* multiblas.cpp */; };
+		4C8CF1331B41BFE400573C31 /* opencl_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C8CF1311B41BFE400573C31 /* opencl_info.cpp */; };
+		4C8CF1361B41C08500573C31 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1351B41C08500573C31 /* OpenCL.framework */; };
+		4C8CF1381B41CCAA00573C31 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1371B41CCAA00573C31 /* R.framework */; };
+		4CD8BB931B45BC1000766B7E /* crossprod_blas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */; };
+		4CD8BB951B45BC1000766B7E /* crossprod_opencl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB8F1B45BC1000766B7E /* crossprod_opencl.cpp */; };
+		4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB911B45BC1000766B7E /* crossprod_naive.cpp */; };
+		4CD8BB981B45BE0F00766B7E /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD8BB971B45BE0F00766B7E /* Accelerate.framework */; };
+		4CD8BB9C1B45C0B500766B7E /* multiblas_crossprod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */; };
+		4CD8BB9D1B45C44500766B7E /* crossprod_clblas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */; };
+		4CE50DEB1B3E0CFE009549D9 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CF708491B3CD6BE009AB227 /* utils.cpp */; };
+		4CE50DEC1B3E0D07009549D9 /* shim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CF708471B3CD6BE009AB227 /* shim.cpp */; };
+		4CF708191B3CD2E7009AB227 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CF708181B3CD2E7009AB227 /* main.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4CF708131B3CD2E7009AB227 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = inst;
+			dstSubfolderSpec = 16;
+			files = (
+				4C7A884A1B50867100DF3799 /* crossprod_d.cl in CopyFiles */,
+				4C7A884B1B50867100DF3799 /* crossprod_f.cl in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4C55152A1B4749F600F20289 /* crossprod_d.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = crossprod_d.cl; sourceTree = "<group>"; };
+		4C55152B1B4749F600F20289 /* crossprod_f.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = crossprod_f.cl; sourceTree = "<group>"; };
+		4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclBLAS.2.4.0.dylib; path = ../../../../../../usr/local/clblas/lib/libclBLAS.2.4.0.dylib; sourceTree = "<group>"; };
+		4C8CF1291B41A63E00573C31 /* multiblas.options.Rd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = multiblas.options.Rd; sourceTree = "<group>"; };
+		4C8CF12A1B41A76500573C31 /* multiblas.options.R */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = multiblas.options.R; sourceTree = "<group>"; };
+		4C8CF12B1B41BE9E00573C31 /* multiblas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiblas.cpp; sourceTree = "<group>"; };
+		4C8CF12C1B41BE9E00573C31 /* multiblas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiblas.h; sourceTree = "<group>"; };
+		4C8CF1311B41BFE400573C31 /* opencl_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opencl_info.cpp; sourceTree = "<group>"; };
+		4C8CF1321B41BFE400573C31 /* opencl_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opencl_info.h; sourceTree = "<group>"; };
+		4C8CF1351B41C08500573C31 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
+		4C8CF1371B41CCAA00573C31 /* R.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = R.framework; path = ../../../../../../Library/Frameworks/R.framework; sourceTree = "<group>"; };
+		4CC15C691B4C4D460091A76F /* amd sdk license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "amd sdk license.txt"; path = "../amd sdk license.txt"; sourceTree = "<group>"; };
+		4CC1B9281B434BE400F00709 /* opencl.R */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = opencl.R; sourceTree = "<group>"; };
+		4CC1B92A1B4354E200F00709 /* opencl.Rd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opencl.Rd; sourceTree = "<group>"; };
+		4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_blas.cpp; sourceTree = "<group>"; };
+		4CD8BB8C1B45BC1000766B7E /* crossprod_blas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crossprod_blas.h; sourceTree = "<group>"; };
+		4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_clblas.cpp; sourceTree = "<group>"; };
+		4CD8BB8E1B45BC1000766B7E /* crossprod_clblas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crossprod_clblas.h; sourceTree = "<group>"; };
+		4CD8BB8F1B45BC1000766B7E /* crossprod_opencl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_opencl.cpp; sourceTree = "<group>"; };
+		4CD8BB901B45BC1000766B7E /* crossprod_opencl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crossprod_opencl.h; sourceTree = "<group>"; };
+		4CD8BB911B45BC1000766B7E /* crossprod_naive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_naive.cpp; sourceTree = "<group>"; };
+		4CD8BB921B45BC1000766B7E /* crossprod_naive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crossprod_naive.h; sourceTree = "<group>"; };
+		4CD8BB971B45BE0F00766B7E /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiblas_crossprod.cpp; sourceTree = "<group>"; };
+		4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiblas_crossprod.h; sourceTree = "<group>"; };
+		4CF708151B3CD2E7009AB227 /* multiBLAS.XC */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = multiBLAS.XC; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CF708181B3CD2E7009AB227 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		4CF708201B3CD56B009AB227 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = makefile; path = ../makefile; sourceTree = "<group>"; };
+		4CF708211B3CD56B009AB227 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		4CF708221B3CD56B009AB227 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE.txt; path = ../LICENSE.txt; sourceTree = "<group>"; };
+		4CF708251B3CD655009AB227 /* .Rbuildignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = .Rbuildignore; path = ../.Rbuildignore; sourceTree = "<group>"; };
+		4CF708261B3CD655009AB227 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = .gitignore; path = ../.gitignore; sourceTree = "<group>"; };
+		4CF708281B3CD6BE009AB227 /* DESCRIPTION */ = {isa = PBXFileReference; lastKnownFileType = text; path = DESCRIPTION; sourceTree = "<group>"; };
+		4CF7082E1B3CD6BE009AB227 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		4CF708301B3CD6BE009AB227 /* multiblas-package.Rd */ = {isa = PBXFileReference; lastKnownFileType = text; path = "multiblas-package.Rd"; sourceTree = "<group>"; };
+		4CF708311B3CD6BE009AB227 /* blas.lib.Rd */ = {isa = PBXFileReference; lastKnownFileType = text; path = blas.lib.Rd; sourceTree = "<group>"; };
+		4CF708321B3CD6BE009AB227 /* NAMESPACE */ = {isa = PBXFileReference; lastKnownFileType = text; path = NAMESPACE; sourceTree = "<group>"; };
+		4CF708341B3CD6BE009AB227 /* blas.lib.R */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.rez; path = blas.lib.R; sourceTree = "<group>"; };
+		4CF708351B3CD6BE009AB227 /* print.blas.lib.R */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.rez; path = print.blas.lib.R; sourceTree = "<group>"; };
+		4CF708471B3CD6BE009AB227 /* shim.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = shim.cpp; sourceTree = "<group>"; };
+		4CF708481B3CD6BE009AB227 /* shim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shim.h; sourceTree = "<group>"; };
+		4CF708491B3CD6BE009AB227 /* utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cpp; sourceTree = "<group>"; };
+		4CF7084A1B3CD6BE009AB227 /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4CF708121B3CD2E7009AB227 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C5761DA1B45E3B500CEB763 /* libclBLAS.2.4.0.dylib in Frameworks */,
+				4CD8BB981B45BE0F00766B7E /* Accelerate.framework in Frameworks */,
+				4C8CF1361B41C08500573C31 /* OpenCL.framework in Frameworks */,
+				4C8CF1381B41CCAA00573C31 /* R.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4C8CF1341B41C06600573C31 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */,
+				4CD8BB971B45BE0F00766B7E /* Accelerate.framework */,
+				4C8CF1371B41CCAA00573C31 /* R.framework */,
+				4C8CF1351B41C08500573C31 /* OpenCL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4CF7080C1B3CD2E7009AB227 = {
+			isa = PBXGroup;
+			children = (
+				4CC15C691B4C4D460091A76F /* amd sdk license.txt */,
+				4C8CF1341B41C06600573C31 /* Frameworks */,
+				4CF7081F1B3CD4DA009AB227 /* root */,
+				4CF708271B3CD6BE009AB227 /* multiblas */,
+				4CF708171B3CD2E7009AB227 /* multiBLAS.XC */,
+				4CF708161B3CD2E7009AB227 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4CF708161B3CD2E7009AB227 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4CF708151B3CD2E7009AB227 /* multiBLAS.XC */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4CF708171B3CD2E7009AB227 /* multiBLAS.XC */ = {
+			isa = PBXGroup;
+			children = (
+				4CF708181B3CD2E7009AB227 /* main.cpp */,
+			);
+			path = multiBLAS.XC;
+			sourceTree = "<group>";
+		};
+		4CF7081F1B3CD4DA009AB227 /* root */ = {
+			isa = PBXGroup;
+			children = (
+				4CF708251B3CD655009AB227 /* .Rbuildignore */,
+				4CF708261B3CD655009AB227 /* .gitignore */,
+				4CF708201B3CD56B009AB227 /* makefile */,
+				4CF708211B3CD56B009AB227 /* README.md */,
+				4CF708221B3CD56B009AB227 /* LICENSE.txt */,
+			);
+			name = root;
+			sourceTree = "<group>";
+		};
+		4CF708271B3CD6BE009AB227 /* multiblas */ = {
+			isa = PBXGroup;
+			children = (
+				4CF708281B3CD6BE009AB227 /* DESCRIPTION */,
+				4CF7082A1B3CD6BE009AB227 /* inst */,
+				4CF7082E1B3CD6BE009AB227 /* LICENSE */,
+				4CF7082F1B3CD6BE009AB227 /* man */,
+				4CF708321B3CD6BE009AB227 /* NAMESPACE */,
+				4CF708331B3CD6BE009AB227 /* R */,
+				4CF708361B3CD6BE009AB227 /* src */,
+			);
+			name = multiblas;
+			path = ../multiblas;
+			sourceTree = "<group>";
+		};
+		4CF7082A1B3CD6BE009AB227 /* inst */ = {
+			isa = PBXGroup;
+			children = (
+				4C55152A1B4749F600F20289 /* crossprod_d.cl */,
+				4C55152B1B4749F600F20289 /* crossprod_f.cl */,
+			);
+			path = inst;
+			sourceTree = "<group>";
+		};
+		4CF7082F1B3CD6BE009AB227 /* man */ = {
+			isa = PBXGroup;
+			children = (
+				4CF708301B3CD6BE009AB227 /* multiblas-package.Rd */,
+				4CF708311B3CD6BE009AB227 /* blas.lib.Rd */,
+				4C8CF1291B41A63E00573C31 /* multiblas.options.Rd */,
+				4CC1B92A1B4354E200F00709 /* opencl.Rd */,
+			);
+			path = man;
+			sourceTree = "<group>";
+		};
+		4CF708331B3CD6BE009AB227 /* R */ = {
+			isa = PBXGroup;
+			children = (
+				4CF708341B3CD6BE009AB227 /* blas.lib.R */,
+				4CF708351B3CD6BE009AB227 /* print.blas.lib.R */,
+				4C8CF12A1B41A76500573C31 /* multiblas.options.R */,
+				4CC1B9281B434BE400F00709 /* opencl.R */,
+			);
+			path = R;
+			sourceTree = "<group>";
+		};
+		4CF708361B3CD6BE009AB227 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */,
+				4CD8BB8C1B45BC1000766B7E /* crossprod_blas.h */,
+				4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */,
+				4CD8BB8E1B45BC1000766B7E /* crossprod_clblas.h */,
+				4CD8BB8F1B45BC1000766B7E /* crossprod_opencl.cpp */,
+				4CD8BB901B45BC1000766B7E /* crossprod_opencl.h */,
+				4CD8BB911B45BC1000766B7E /* crossprod_naive.cpp */,
+				4CD8BB921B45BC1000766B7E /* crossprod_naive.h */,
+				4C8CF12B1B41BE9E00573C31 /* multiblas.cpp */,
+				4C8CF12C1B41BE9E00573C31 /* multiblas.h */,
+				4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */,
+				4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */,
+				4C8CF1311B41BFE400573C31 /* opencl_info.cpp */,
+				4C8CF1321B41BFE400573C31 /* opencl_info.h */,
+				4CF708471B3CD6BE009AB227 /* shim.cpp */,
+				4CF708481B3CD6BE009AB227 /* shim.h */,
+				4CF708491B3CD6BE009AB227 /* utils.cpp */,
+				4CF7084A1B3CD6BE009AB227 /* utils.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4CF708141B3CD2E7009AB227 /* multiBLAS.XC */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CF7081C1B3CD2E7009AB227 /* Build configuration list for PBXNativeTarget "multiBLAS.XC" */;
+			buildPhases = (
+				4CF708111B3CD2E7009AB227 /* Sources */,
+				4CF708121B3CD2E7009AB227 /* Frameworks */,
+				4CF708131B3CD2E7009AB227 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = multiBLAS.XC;
+			productName = multiBLAS.XC;
+			productReference = 4CF708151B3CD2E7009AB227 /* multiBLAS.XC */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4CF7080D1B3CD2E7009AB227 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = "Quadrivio Corporation";
+				TargetAttributes = {
+					4CF708141B3CD2E7009AB227 = {
+						CreatedOnToolsVersion = 6.3.2;
+					};
+				};
+			};
+			buildConfigurationList = 4CF708101B3CD2E7009AB227 /* Build configuration list for PBXProject "multiBLAS.XC" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4CF7080C1B3CD2E7009AB227;
+			productRefGroup = 4CF708161B3CD2E7009AB227 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4CF708141B3CD2E7009AB227 /* multiBLAS.XC */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4CF708111B3CD2E7009AB227 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */,
+				4CD8BB9C1B45C0B500766B7E /* multiblas_crossprod.cpp in Sources */,
+				4C8CF1331B41BFE400573C31 /* opencl_info.cpp in Sources */,
+				4CF708191B3CD2E7009AB227 /* main.cpp in Sources */,
+				4CD8BB9D1B45C44500766B7E /* crossprod_clblas.cpp in Sources */,
+				4CE50DEC1B3E0D07009549D9 /* shim.cpp in Sources */,
+				4CD8BB951B45BC1000766B7E /* crossprod_opencl.cpp in Sources */,
+				4CD8BB931B45BC1000766B7E /* crossprod_blas.cpp in Sources */,
+				4CE50DEB1B3E0CFE009549D9 /* utils.cpp in Sources */,
+				4C8CF12D1B41BE9E00573C31 /* multiblas.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4CF7081A1B3CD2E7009AB227 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4CF7081B1B3CD2E7009AB227 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		4CF7081D1B3CD2E7009AB227 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"RPACKAGE=0",
+					NO_CLBLAS,
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Library/Frameworks/R.framework/Headers,
+					/usr/local/clblas/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/clblas/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		4CF7081E1B3CD2E7009AB227 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = "RPACKAGE=0";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/Library/Frameworks/R.framework/Headers,
+					/usr/local/clblas/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/clblas/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4CF708101B3CD2E7009AB227 /* Build configuration list for PBXProject "multiBLAS.XC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CF7081A1B3CD2E7009AB227 /* Debug */,
+				4CF7081B1B3CD2E7009AB227 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4CF7081C1B3CD2E7009AB227 /* Build configuration list for PBXNativeTarget "multiBLAS.XC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CF7081D1B3CD2E7009AB227 /* Debug */,
+				4CF7081E1B3CD2E7009AB227 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4CF7080D1B3CD2E7009AB227 /* Project object */;
+}

@@ -1,0 +1,11 @@
+Package: multiblas
+Type: Package
+Title: Project multiblas
+Version: 0.00-1
+Date: 2015-06-29
+Author: Michael Budiansky
+Copyright: Quadrivio Corporation
+Maintainer: <software@quadrivio.com>
+Description: A project multiblas.
+License: BSD_2_clause + file LICENSE
+SystemRequirements: OpenCL library

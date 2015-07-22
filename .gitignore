@@ -1,0 +1,12 @@
+.DS_Store
+*.tar.gz
+*.Rcheck/
+Build/
+bin/
+obj/
+*.xccheckout
+xcuserdata
+*.o
+*.so
+*.rds
+*.txt
