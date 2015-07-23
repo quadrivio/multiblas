@@ -218,6 +218,8 @@
 		4CF708361B3CD6BE009AB227 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */,
+				4C61ABD41B616CDB00F41D23 /* multiblas_gemm.h */,
 				4C61ABD01B61579400F41D23 /* gemm_blas.cpp */,
 				4C61ABD11B61579400F41D23 /* gemm_blas.h */,
 				4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */,
@@ -238,8 +240,6 @@
 				4C8CF12C1B41BE9E00573C31 /* multiblas.h */,
 				4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */,
 				4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */,
-				4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */,
-				4C61ABD41B616CDB00F41D23 /* multiblas_gemm.h */,
 				4C8CF1311B41BFE400573C31 /* opencl_info.cpp */,
 				4C8CF1321B41BFE400573C31 /* opencl_info.h */,
 				4CF708471B3CD6BE009AB227 /* shim.cpp */,
