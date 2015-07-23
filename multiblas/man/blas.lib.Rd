@@ -34,7 +34,10 @@ blas.lib(type, processor, index, option, label, kernel.path.f, kernel.path.d,
     \item{\dots}{other stuff}
 }
 \value{
-    Returns object containing BLAS methods}
+    Returns object containing BLAS methods.
+    \item{crossprod}{Function crossprod(x) where x is input matrix.}
+    \item{gemm}{Function gemm(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0)}
+}
 \author{
     Michael Budiansky, Quadrivio Corporation
 }

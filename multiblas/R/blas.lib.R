@@ -124,11 +124,23 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
     if (blas$type == "R") {
         blas$crossprod <- function(x) { .Call(crossprod_blas_C, x) }
         
+        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+            .Call(gemm_blas_C, A, transposeA, B, transposeB, C, alpha, beta)
+        }
+        
     } else if (blas$type == "Naive") {
         blas$crossprod <- function(x) { .Call(crossprod_naive_C, x) }
         
+        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+            .Call(gemm_naive_C, A, transposeA, B, transposeB, C, alpha, beta)
+        }
+        
     } else if (blas$type == "clBLAS") {
         blas$crossprod <- function(x) { .Call(crossprod_clblas_C, blas$device, x) }
+        
+        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+            .Call(gemm_clblas_C, blas$device, A, transposeA, B, transposeB, C, alpha, beta)
+        }
         
     } else if (blas$type == "OpenCL") {
         if (is.na(kernel.path.f)) {
@@ -229,9 +241,12 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
                 blas$queue, x, work.item.sizes, row.multiple, col.multiple,
                 row.tile.size, col.tile.size, fill.on.host, verbose)
         }
-        
+
+        blas$gemm <- NA
+
     } else {
         blas$crossprod <- NA
+        blas$gemm <- NA
     }
 
     blas$fun <- sqrt

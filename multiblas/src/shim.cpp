@@ -85,7 +85,7 @@ void r_logic_error(const std::string& path, int line, const std::string& msg)
     ostringstream oss;
     oss << msg << " at " << file << " line " << line << endl;
     
-    error(oss.str().c_str());
+    Rf_error(oss.str().c_str());
 }
 
 // call R error function with custom message; include source file name and line number if DEBUG
@@ -111,7 +111,7 @@ void r_runtime_error(const std::string& path, int line, const std::string& msg)
     cerr << msg << " at " << file << " line " << line << endl;
 #endif
     
-    error(msg.c_str());
+    Rf_error(msg.c_str());
 }
 
 

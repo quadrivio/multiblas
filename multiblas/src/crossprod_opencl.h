@@ -15,7 +15,7 @@
 #include <CL/opencl.h>
 #endif
 
-#include<vector>
+#include <vector>
 
 cl_int opencl_calc_x(cl_context context, cl_kernel kernel_f, cl_kernel kernel_d, bool is_float,
                      cl_command_queue queue, void *inMatrix, void *outMatrix, size_t nrow, size_t ncol,

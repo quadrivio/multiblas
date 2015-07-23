@@ -15,22 +15,11 @@
 #include <CL/opencl.h>
 #endif
 
-#include <string>
-
 #include <clBLAS.h>
-
-struct ErrorStatus {
-    cl_int error;
-    clblasStatus status;
-};
-typedef struct ErrorStatus ErrorStatus;
-
+#include "utils_clblas.h"
 
 ErrorStatus crossprod_clblas_d(cl_device_id device, double *inMatrix, double *outMatrix, int nrow, int ncol);
 ErrorStatus crossprod_clblas_f(cl_device_id device, float *inMatrix, float *outMatrix, int nrow, int ncol);
 ErrorStatus crossprod_clblas(cl_device_id device, void *inMatrix, void *outMatrix, int nrow, int ncol, bool use_float);
-
-std::string clblasErrorToString(clblasStatus error);
-
 
 #endif /* defined(__template__crossprod__) */

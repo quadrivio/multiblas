@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		4C5761DA1B45E3B500CEB763 /* libclBLAS.2.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */; };
+		4C61ABD21B61579400F41D23 /* gemm_blas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD01B61579400F41D23 /* gemm_blas.cpp */; };
+		4C61ABD51B616CDB00F41D23 /* multiblas_gemm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */; };
+		4C61ABD81B616E7F00F41D23 /* gemm_clblas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */; };
+		4C61ABDB1B616E8F00F41D23 /* gemm_opencl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD91B616E8F00F41D23 /* gemm_opencl.cpp */; };
+		4C61ABDE1B616E9E00F41D23 /* gemm_naive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABDC1B616E9E00F41D23 /* gemm_naive.cpp */; };
+		4C61ABE11B616F2D00F41D23 /* utils_clblas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABDF1B616F2D00F41D23 /* utils_clblas.cpp */; };
 		4C7A884A1B50867100DF3799 /* crossprod_d.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4C55152A1B4749F600F20289 /* crossprod_d.cl */; };
 		4C7A884B1B50867100DF3799 /* crossprod_f.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4C55152B1B4749F600F20289 /* crossprod_f.cl */; };
 		4C8CF12D1B41BE9E00573C31 /* multiblas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C8CF12B1B41BE9E00573C31 /* multiblas.cpp */; };
@@ -43,6 +49,18 @@
 		4C55152A1B4749F600F20289 /* crossprod_d.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = crossprod_d.cl; sourceTree = "<group>"; };
 		4C55152B1B4749F600F20289 /* crossprod_f.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = crossprod_f.cl; sourceTree = "<group>"; };
 		4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclBLAS.2.4.0.dylib; path = ../../../../../../usr/local/clblas/lib/libclBLAS.2.4.0.dylib; sourceTree = "<group>"; };
+		4C61ABD01B61579400F41D23 /* gemm_blas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gemm_blas.cpp; sourceTree = "<group>"; };
+		4C61ABD11B61579400F41D23 /* gemm_blas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gemm_blas.h; sourceTree = "<group>"; };
+		4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiblas_gemm.cpp; sourceTree = "<group>"; };
+		4C61ABD41B616CDB00F41D23 /* multiblas_gemm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiblas_gemm.h; sourceTree = "<group>"; };
+		4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gemm_clblas.cpp; sourceTree = "<group>"; };
+		4C61ABD71B616E7F00F41D23 /* gemm_clblas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gemm_clblas.h; sourceTree = "<group>"; };
+		4C61ABD91B616E8F00F41D23 /* gemm_opencl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gemm_opencl.cpp; sourceTree = "<group>"; };
+		4C61ABDA1B616E8F00F41D23 /* gemm_opencl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gemm_opencl.h; sourceTree = "<group>"; };
+		4C61ABDC1B616E9E00F41D23 /* gemm_naive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gemm_naive.cpp; sourceTree = "<group>"; };
+		4C61ABDD1B616E9E00F41D23 /* gemm_naive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gemm_naive.h; sourceTree = "<group>"; };
+		4C61ABDF1B616F2D00F41D23 /* utils_clblas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utils_clblas.cpp; sourceTree = "<group>"; };
+		4C61ABE01B616F2D00F41D23 /* utils_clblas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utils_clblas.h; sourceTree = "<group>"; };
 		4C8CF1291B41A63E00573C31 /* multiblas.options.Rd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = multiblas.options.Rd; sourceTree = "<group>"; };
 		4C8CF12A1B41A76500573C31 /* multiblas.options.R */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = multiblas.options.R; sourceTree = "<group>"; };
 		4C8CF12B1B41BE9E00573C31 /* multiblas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiblas.cpp; sourceTree = "<group>"; };
@@ -200,6 +218,14 @@
 		4CF708361B3CD6BE009AB227 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				4C61ABD01B61579400F41D23 /* gemm_blas.cpp */,
+				4C61ABD11B61579400F41D23 /* gemm_blas.h */,
+				4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */,
+				4C61ABD71B616E7F00F41D23 /* gemm_clblas.h */,
+				4C61ABD91B616E8F00F41D23 /* gemm_opencl.cpp */,
+				4C61ABDA1B616E8F00F41D23 /* gemm_opencl.h */,
+				4C61ABDC1B616E9E00F41D23 /* gemm_naive.cpp */,
+				4C61ABDD1B616E9E00F41D23 /* gemm_naive.h */,
 				4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */,
 				4CD8BB8C1B45BC1000766B7E /* crossprod_blas.h */,
 				4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */,
@@ -212,10 +238,14 @@
 				4C8CF12C1B41BE9E00573C31 /* multiblas.h */,
 				4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */,
 				4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */,
+				4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */,
+				4C61ABD41B616CDB00F41D23 /* multiblas_gemm.h */,
 				4C8CF1311B41BFE400573C31 /* opencl_info.cpp */,
 				4C8CF1321B41BFE400573C31 /* opencl_info.h */,
 				4CF708471B3CD6BE009AB227 /* shim.cpp */,
 				4CF708481B3CD6BE009AB227 /* shim.h */,
+				4C61ABDF1B616F2D00F41D23 /* utils_clblas.cpp */,
+				4C61ABE01B616F2D00F41D23 /* utils_clblas.h */,
 				4CF708491B3CD6BE009AB227 /* utils.cpp */,
 				4CF7084A1B3CD6BE009AB227 /* utils.h */,
 			);
@@ -278,10 +308,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C61ABDE1B616E9E00F41D23 /* gemm_naive.cpp in Sources */,
 				4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */,
+				4C61ABE11B616F2D00F41D23 /* utils_clblas.cpp in Sources */,
 				4CD8BB9C1B45C0B500766B7E /* multiblas_crossprod.cpp in Sources */,
 				4C8CF1331B41BFE400573C31 /* opencl_info.cpp in Sources */,
 				4CF708191B3CD2E7009AB227 /* main.cpp in Sources */,
+				4C61ABDB1B616E8F00F41D23 /* gemm_opencl.cpp in Sources */,
+				4C61ABD21B61579400F41D23 /* gemm_blas.cpp in Sources */,
+				4C61ABD81B616E7F00F41D23 /* gemm_clblas.cpp in Sources */,
+				4C61ABD51B616CDB00F41D23 /* multiblas_gemm.cpp in Sources */,
 				4CD8BB9D1B45C44500766B7E /* crossprod_clblas.cpp in Sources */,
 				4CE50DEC1B3E0D07009549D9 /* shim.cpp in Sources */,
 				4CD8BB951B45BC1000766B7E /* crossprod_opencl.cpp in Sources */,
@@ -380,7 +416,7 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"RPACKAGE=0",
+					"RPACKAGE=1",
 					NO_CLBLAS,
 				);
 				HEADER_SEARCH_PATHS = (
@@ -405,7 +441,7 @@
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
-				GCC_PREPROCESSOR_DEFINITIONS = "RPACKAGE=0";
+				GCC_PREPROCESSOR_DEFINITIONS = "RPACKAGE=1";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,

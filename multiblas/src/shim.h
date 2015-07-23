@@ -35,8 +35,8 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
-#include <R.h>
 #define R_NO_REMAP
+#include <R.h>
 #include <Rinternals.h>
 // ---------------------------------------------------------
 

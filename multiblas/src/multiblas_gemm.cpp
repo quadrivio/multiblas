@@ -1,16 +1,16 @@
 //
-//  multiblas_crossprod.cpp
+//  multiblas_gemm.cpp
 //  multiBLAS.XC
 //
-//  Created by michael on 7/2/15.
+//  Created by michael on 7/23/15.
 //  Copyright (c) 2015 Quadrivio Corporation. All rights reserved.
 //
 
-#include "multiblas_crossprod.h"
+#include "multiblas_gemm.h"
 #include "opencl_info.h"
-#include "crossprod_naive.h"
-#include "crossprod_blas.h"
-#include "crossprod_clblas.h"
+#include "gemm_naive.h"
+#include "gemm_blas.h"
+#include "gemm_clblas.h"
 
 #if defined(__APPLE__)
 #include <OpenCL/opencl.h>
@@ -37,9 +37,14 @@ extern bool gTrace;    // for debugging
 
 // ========== Functions ============================================================================
 
-SEXP crossprod_naive_C(SEXP s_x)
+SEXP gemm_naive_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta)
 {
-    if (gTrace) CERR << "crossprod_naive_C" << endl;
+    SEXP result = PROTECT(Rf_allocVector(INTSXP, 1));
+    *INTEGER(result) = NA_INTEGER;
+    UNPROTECT(1);
+
+#if 0
+    if (gTrace) CERR << "gemm_naive_C" << endl;
     
     int resultUnprotectCount = 0;
     
@@ -48,13 +53,13 @@ SEXP crossprod_naive_C(SEXP s_x)
     if (gTrace) CERR << "verify arg type" << endl;
     
     if (Rf_isComplex(s_x)) {
-        Rf_error("crossprod_naive_C: complex x not implemented yet");
+        error("gemm_naive_C: complex x not implemented yet");
         
     } else if (Rf_isInteger(s_x)) {
-        Rf_error("crossprod_naive_C: integer x not implemented yet");
+        error("gemm_naive_C: integer x not implemented yet");
         
     } else if (!Rf_isReal(s_x) && !Rf_isInteger(s_x)) {
-        Rf_error("crossprod_naive_C: wrong x type");
+        error("gemm_naive_C: wrong x type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_x) = " << XLENGTH(s_x) << endl;
@@ -64,7 +69,7 @@ SEXP crossprod_naive_C(SEXP s_x)
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims)) {
-        Rf_error("crossprod_naive_C: no dimensions");
+        error("gemm_naive_C: no dimensions");
     }
     
     SEXP s_float;
@@ -85,7 +90,7 @@ SEXP crossprod_naive_C(SEXP s_x)
     }
     
     if (dimCount != 2) {
-        Rf_error("crossprod_naive_C: wrong dimension");
+        error("gemm_naive_C: wrong dimension");
     }
     
     // --------------- get arg ---------------
@@ -125,7 +130,7 @@ SEXP crossprod_naive_C(SEXP s_x)
         float *outMatrix = (float *)calloc(ncol * ncol, sizeof(float));
         
         if (inMatrix == nullptr || outMatrix == nullptr) {
-            Rf_error("crossprod_naive_C: insufficient memory");
+            error("gemm_naive_C: insufficient memory");
             
         } else {
             float *p = inMatrix;
@@ -134,7 +139,7 @@ SEXP crossprod_naive_C(SEXP s_x)
                 *p++ = (float)*q++;
             }
             
-            crossprod_naive(inMatrix, outMatrix, dims[0], dims[1]);
+            gemm_naive(inMatrix, outMatrix, dims[0], dims[1]);
             
             p = outMatrix;
             q = REAL(result);
@@ -154,7 +159,7 @@ SEXP crossprod_naive_C(SEXP s_x)
         }
         
     } else {
-        crossprod_naive(x, REAL(result), dims[0], dims[1]);
+        gemm_naive(x, REAL(result), dims[0], dims[1]);
     }
     
     // ---------------------------------------------------------------------------------------------
@@ -162,13 +167,19 @@ SEXP crossprod_naive_C(SEXP s_x)
     UNPROTECT(resultUnprotectCount);
     
     if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+#endif
     
     return(result);
 }
 
-SEXP crossprod_blas_C(SEXP s_x)
+SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta)
 {
-    if (gTrace) CERR << "crossprod_blas_C" << endl;
+    SEXP result = PROTECT(Rf_allocVector(INTSXP, 1));
+    *INTEGER(result) = NA_INTEGER;
+    UNPROTECT(1);
+    
+#if 0
+    if (gTrace) CERR << "gemm_blas_C" << endl;
     
     int resultUnprotectCount = 0;
     
@@ -177,13 +188,13 @@ SEXP crossprod_blas_C(SEXP s_x)
     if (gTrace) CERR << "verify arg type" << endl;
     
     if (Rf_isComplex(s_x)) {
-        Rf_error("crossprod_blas_C: complex x not implemented yet");
+        error("gemm_blas_C: complex x not implemented yet");
         
     } else if (Rf_isInteger(s_x)) {
-        Rf_error("crossprod_blas_C: integer x not implemented yet");
+        error("gemm_blas_C: integer x not implemented yet");
         
     } else if (!Rf_isReal(s_x) && !Rf_isInteger(s_x)) {
-        Rf_error("crossprod_blas_C: wrong x type");
+        error("gemm_blas_C: wrong x type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_x) = " << XLENGTH(s_x) << endl;
@@ -193,7 +204,7 @@ SEXP crossprod_blas_C(SEXP s_x)
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims)) {
-        Rf_error("crossprod_blas_C: no dimensions");
+        error("gemm_blas_C: no dimensions");
     }
     
     SEXP s_float;
@@ -214,7 +225,7 @@ SEXP crossprod_blas_C(SEXP s_x)
     }
     
     if (dimCount != 2) {
-        Rf_error("crossprod_blas_C: wrong dimension");
+        error("gemm_blas_C: wrong dimension");
     }
     
     // --------------- get arg ---------------
@@ -254,7 +265,7 @@ SEXP crossprod_blas_C(SEXP s_x)
         float *outMatrix = (float *)calloc(ncol * ncol, sizeof(float));
         
         if (inMatrix == nullptr || outMatrix == nullptr) {
-            Rf_error("crossprod_blas_C: insufficient memory");
+            error("gemm_blas_C: insufficient memory");
             
         } else {
             float *p = inMatrix;
@@ -263,7 +274,7 @@ SEXP crossprod_blas_C(SEXP s_x)
                 *p++ = (float)*q++;
             }
             
-            crossprod_blas_f(inMatrix, outMatrix, dims[0], dims[1]);
+            gemm_blas_f(inMatrix, outMatrix, dims[0], dims[1]);
             
             p = outMatrix;
             q = REAL(result);
@@ -283,7 +294,7 @@ SEXP crossprod_blas_C(SEXP s_x)
         }
         
     } else {
-        crossprod_blas_d(x, REAL(result), dims[0], dims[1]);
+        gemm_blas_d(x, REAL(result), dims[0], dims[1]);
     }
     
     // ---------------------------------------------------------------------------------------------
@@ -291,13 +302,19 @@ SEXP crossprod_blas_C(SEXP s_x)
     UNPROTECT(resultUnprotectCount);
     
     if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+#endif
     
     return(result);
 }
 
-SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
+SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta)
 {
-    if (gTrace) CERR << "crossprod_clblas_C" << endl;
+    SEXP result = PROTECT(Rf_allocVector(INTSXP, 1));
+    *INTEGER(result) = NA_INTEGER;
+    UNPROTECT(1);
+    
+#if 0
+    if (gTrace) CERR << "gemm_clblas_C" << endl;
     
     int resultUnprotectCount = 0;
     
@@ -310,20 +327,20 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
         PROTECT(deviceClass = Rf_getAttrib(s_device, R_ClassSymbol));
         
         if (!Rf_isNull(deviceClass) && strcmp("opencl.device", CHAR(STRING_ELT(deviceClass, 0))) != 0) {
-            Rf_error("crossprod_clblas_C: wrong device class");
+            error("gemm_clblas_C: wrong device class");
         }
         
         UNPROTECT(1);
     }
-
+    
     if (Rf_isComplex(s_x)) {
-        Rf_error("crossprod_clblas_C: complex x not implemented yet");
+        error("gemm_clblas_C: complex x not implemented yet");
         
     } else if (Rf_isInteger(s_x)) {
-        Rf_error("crossprod_clblas_C: integer x not implemented yet");
+        error("gemm_clblas_C: integer x not implemented yet");
         
     } else if (!Rf_isReal(s_x) && !Rf_isInteger(s_x)) {
-        Rf_error("crossprod_clblas_C: wrong x type");
+        error("gemm_clblas_C: wrong x type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_x) = " << XLENGTH(s_x) << endl;
@@ -333,7 +350,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims)) {
-        Rf_error("crossprod_clblas_C: no dimensions");
+        error("gemm_clblas_C: no dimensions");
     }
     
     SEXP s_float;
@@ -354,7 +371,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
     }
     
     if (dimCount != 2) {
-        Rf_error("crossprod_clblas_C: wrong dimension");
+        error("gemm_clblas_C: wrong dimension");
     }
     
     // --------------- get arg ---------------
@@ -365,7 +382,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
     cl_device_id device_id = (cl_device_id)R_ExternalPtrAddr(s_id);
     
     if (device_id == nullptr) {
-        Rf_error("crossprod_clblas_C: null cl_device_id");
+        error("gemm_clblas_C: null cl_device_id");
     }
     
     if (gTrace) CERR << "cl_device_id = " << hex << (unsigned long long)(void *)device_id << dec << endl;
@@ -393,13 +410,13 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
     INTEGER(s_out_dims)[0] = (int)ncol;
     INTEGER(s_out_dims)[1] = (int)ncol;
     Rf_setAttrib(result, R_DimSymbol, s_out_dims);
-
+    
     if (isFloat) {
         Rf_setAttrib(result, Rf_install("Csingle"), Rf_ScalarLogical(1));
     }
     
     ErrorStatus errorStatus;
-
+    
     if (isFloat) {
         size_t len = XLENGTH(s_x);
         
@@ -407,7 +424,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
         float *outMatrix = (float *)calloc(ncol * ncol, sizeof(float));
         
         if (inMatrix == nullptr || outMatrix == nullptr) {
-            Rf_error("crossprod_naive_C: insufficient memory");
+            error("gemm_naive_C: insufficient memory");
             
         } else {
             float *p = inMatrix;
@@ -416,7 +433,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
                 *p++ = (float)*q++;
             }
             
-            errorStatus = crossprod_clblas_f(device_id, inMatrix, outMatrix, dims[0], dims[1]);
+            errorStatus = gemm_clblas_f(device_id, inMatrix, outMatrix, dims[0], dims[1]);
             
             p = outMatrix;
             q = REAL(result);
@@ -436,14 +453,14 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
         }
         
     } else {
-        errorStatus = crossprod_clblas_d(device_id, x, REAL(result), dims[0], dims[1]);
+        errorStatus = gemm_clblas_d(device_id, x, REAL(result), dims[0], dims[1]);
     }
     
     if (errorStatus.error != CL_SUCCESS) {
-        Rf_error(clErrorToString(errorStatus.error).c_str());
+        error(clErrorToString(errorStatus.error).c_str());
         
     } else if (errorStatus.status != clblasSuccess) {
-        Rf_error(clblasErrorToString(errorStatus.status).c_str());
+        error(clblasErrorToString(errorStatus.status).c_str());
     }
     
     // ---------------------------------------------------------------------------------------------
@@ -451,6 +468,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
     UNPROTECT(resultUnprotectCount);
     
     if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+#endif
     
     return(result);
 }
