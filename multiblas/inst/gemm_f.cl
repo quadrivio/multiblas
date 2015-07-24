@@ -18,5 +18,5 @@ __kernel void gemm_f_naive(__private int inputA_nrow,
     }
     
     output[output_col * inputA_nrow + output_row] *= beta;
-    output[output_col * inputA_nrow + output_row] += alpha * sum];
+    output[output_col * inputA_nrow + output_row] += alpha * sum;
 }

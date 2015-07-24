@@ -18,7 +18,7 @@
 
 // ========== Globals ==============================================================================
 
-bool gTrace = false;    // for debugging
+bool gTrace = true;    // for debugging
 
 #if RPACKAGE
 
@@ -1052,6 +1052,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
                      SEXP s_work_item_sizes, SEXP s_row_multiple, SEXP s_col_multiple,
                      SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host, SEXP s_verbose)
 {
+    
 #ifdef USE_TIMING
     steady_clock::time_point start_time = steady_clock::now();
 #endif
@@ -1245,16 +1246,6 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
     
     cl_int err = CL_SUCCESS;
     
-//    size_t filled_nrow = nrow;
-//    filled_nrow = row_multiple * ((filled_nrow + row_multiple - 1) / row_multiple);
-//    
-//    size_t filled_ncol = ncol;
-//    filled_ncol = col_multiple * ((filled_ncol + col_multiple - 1) / col_multiple);
-//    filled_ncol = work_item_sizes[0] * ((filled_ncol + work_item_sizes[0] - 1) / work_item_sizes[0]);
-//    filled_ncol = work_item_sizes[1] * ((filled_ncol + work_item_sizes[1] - 1) / work_item_sizes[1]);
-//    filled_ncol = col_tile_size * ((filled_ncol + col_tile_size - 1) / col_tile_size);
-//    filled_ncol = row_tile_size * ((filled_ncol + row_tile_size - 1) / row_tile_size);
-
     size_t filled_nrow = row_multiple * ((nrow + row_multiple - 1) / row_multiple);
     
     // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size

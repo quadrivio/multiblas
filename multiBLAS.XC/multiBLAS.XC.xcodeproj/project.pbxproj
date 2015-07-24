@@ -21,7 +21,6 @@
 		4C8CF1361B41C08500573C31 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1351B41C08500573C31 /* OpenCL.framework */; };
 		4C8CF1381B41CCAA00573C31 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1371B41CCAA00573C31 /* R.framework */; };
 		4CD4E1001B61CB2D0008D3D0 /* gemm_f.cl in Sources */ = {isa = PBXBuildFile; fileRef = 4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */; };
-		4CD4E1021B61CB3F0008D3D0 /* gemm_d.cl in Sources */ = {isa = PBXBuildFile; fileRef = 4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */; };
 		4CD4E1031B61CB690008D3D0 /* gemm_d.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */; };
 		4CD4E1041B61CB690008D3D0 /* gemm_f.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */; };
 		4CD8BB931B45BC1000766B7E /* crossprod_blas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */; };
@@ -319,7 +318,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C61ABDE1B616E9E00F41D23 /* gemm_naive.cpp in Sources */,
-				4CD4E1021B61CB3F0008D3D0 /* gemm_d.cl in Sources */,
 				4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */,
 				4C61ABE11B616F2D00F41D23 /* utils_clblas.cpp in Sources */,
 				4CD8BB9C1B45C0B500766B7E /* multiblas_crossprod.cpp in Sources */,
