@@ -53,6 +53,14 @@ multiblas.options <- function(types = NA, processors = NA)
         options <- append.option(options, option)
     }
     
+    if (is.na(types) || "Base" %in% types || "base" %in% types) {
+        label <- "Base"
+        option <- list(type="Base", platform=NA, device=NA, processor=NA, label=label, path=NA)
+        class(option) <- "multiblas.option"
+        
+        options <- append.option(options, option)
+    }
+    
     if (is.na(types) || "clBLAS" %in% types || "clblas" %in% types) {
         platforms <- .Call(opencl_platforms_C)
         for (platform in platforms) {

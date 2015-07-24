@@ -20,6 +20,10 @@
 		4C8CF1331B41BFE400573C31 /* opencl_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C8CF1311B41BFE400573C31 /* opencl_info.cpp */; };
 		4C8CF1361B41C08500573C31 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1351B41C08500573C31 /* OpenCL.framework */; };
 		4C8CF1381B41CCAA00573C31 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1371B41CCAA00573C31 /* R.framework */; };
+		4CD4E1001B61CB2D0008D3D0 /* gemm_f.cl in Sources */ = {isa = PBXBuildFile; fileRef = 4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */; };
+		4CD4E1021B61CB3F0008D3D0 /* gemm_d.cl in Sources */ = {isa = PBXBuildFile; fileRef = 4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */; };
+		4CD4E1031B61CB690008D3D0 /* gemm_d.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */; };
+		4CD4E1041B61CB690008D3D0 /* gemm_f.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */; };
 		4CD8BB931B45BC1000766B7E /* crossprod_blas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */; };
 		4CD8BB951B45BC1000766B7E /* crossprod_opencl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB8F1B45BC1000766B7E /* crossprod_opencl.cpp */; };
 		4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8BB911B45BC1000766B7E /* crossprod_naive.cpp */; };
@@ -38,6 +42,8 @@
 			dstPath = inst;
 			dstSubfolderSpec = 16;
 			files = (
+				4CD4E1031B61CB690008D3D0 /* gemm_d.cl in CopyFiles */,
+				4CD4E1041B61CB690008D3D0 /* gemm_f.cl in CopyFiles */,
 				4C7A884A1B50867100DF3799 /* crossprod_d.cl in CopyFiles */,
 				4C7A884B1B50867100DF3799 /* crossprod_f.cl in CopyFiles */,
 			);
@@ -72,6 +78,8 @@
 		4CC15C691B4C4D460091A76F /* amd sdk license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "amd sdk license.txt"; path = "../amd sdk license.txt"; sourceTree = "<group>"; };
 		4CC1B9281B434BE400F00709 /* opencl.R */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = opencl.R; sourceTree = "<group>"; };
 		4CC1B92A1B4354E200F00709 /* opencl.Rd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opencl.Rd; sourceTree = "<group>"; };
+		4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = gemm_f.cl; sourceTree = "<group>"; };
+		4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = gemm_d.cl; sourceTree = "<group>"; };
 		4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_blas.cpp; sourceTree = "<group>"; };
 		4CD8BB8C1B45BC1000766B7E /* crossprod_blas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crossprod_blas.h; sourceTree = "<group>"; };
 		4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_clblas.cpp; sourceTree = "<group>"; };
@@ -189,6 +197,8 @@
 			children = (
 				4C55152A1B4749F600F20289 /* crossprod_d.cl */,
 				4C55152B1B4749F600F20289 /* crossprod_f.cl */,
+				4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */,
+				4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */,
 			);
 			path = inst;
 			sourceTree = "<group>";
@@ -228,6 +238,8 @@
 				4C61ABDA1B616E8F00F41D23 /* gemm_opencl.h */,
 				4C61ABDC1B616E9E00F41D23 /* gemm_naive.cpp */,
 				4C61ABDD1B616E9E00F41D23 /* gemm_naive.h */,
+				4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */,
+				4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */,
 				4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */,
 				4CD8BB8C1B45BC1000766B7E /* crossprod_blas.h */,
 				4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */,
@@ -238,8 +250,6 @@
 				4CD8BB921B45BC1000766B7E /* crossprod_naive.h */,
 				4C8CF12B1B41BE9E00573C31 /* multiblas.cpp */,
 				4C8CF12C1B41BE9E00573C31 /* multiblas.h */,
-				4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */,
-				4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */,
 				4C8CF1311B41BFE400573C31 /* opencl_info.cpp */,
 				4C8CF1321B41BFE400573C31 /* opencl_info.h */,
 				4CF708471B3CD6BE009AB227 /* shim.cpp */,
@@ -309,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C61ABDE1B616E9E00F41D23 /* gemm_naive.cpp in Sources */,
+				4CD4E1021B61CB3F0008D3D0 /* gemm_d.cl in Sources */,
 				4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */,
 				4C61ABE11B616F2D00F41D23 /* utils_clblas.cpp in Sources */,
 				4CD8BB9C1B45C0B500766B7E /* multiblas_crossprod.cpp in Sources */,
@@ -321,6 +332,7 @@
 				4CD8BB9D1B45C44500766B7E /* crossprod_clblas.cpp in Sources */,
 				4CE50DEC1B3E0D07009549D9 /* shim.cpp in Sources */,
 				4CD8BB951B45BC1000766B7E /* crossprod_opencl.cpp in Sources */,
+				4CD4E1001B61CB2D0008D3D0 /* gemm_f.cl in Sources */,
 				4CD8BB931B45BC1000766B7E /* crossprod_blas.cpp in Sources */,
 				4CE50DEB1B3E0CFE009549D9 /* utils.cpp in Sources */,
 				4C8CF12D1B41BE9E00573C31 /* multiblas.cpp in Sources */,

@@ -60,6 +60,17 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         options <- multiblas.options("Naive")
         option <- options[[1]]
         
+    } else if (type == "Base" || type == "base") {
+        if (!is.na(index)) stop("cannot specify index and type")
+        if (!is.na(option)) stop("cannot specify option and type")
+        
+        if (!is.na(processor)) stop("cannot specify processor with this type")
+        
+        type <- "Base"
+        
+        options <- multiblas.options("Base")
+        option <- options[[1]]
+        
     } else if (type == "clBLAS" || type == "clblas") {
         if (!is.na(index)) stop("cannot specify index and type")
         if (!is.na(option)) stop("cannot specify option and type")
@@ -133,6 +144,32 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         
         blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             .Call(gemm_naive_C, A, transposeA, B, transposeB, C, alpha, beta)
+        }
+        
+    } else if (blas$type == "Base") {
+        blas$crossprod <- function(x) { crossprod(x) }
+        
+        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+            if (transposeA) A <- t(A)
+            if (transposeB) B <- t(B)
+            if (is.na(C)) C <- 0.0
+            
+            result <- alpha * A %*% B + beta * C
+            
+            singleA <- attr(A, "Csingle")
+            singleA <- !is.null(singleA) && singleA
+            
+            singleB <- attr(B, "Csingle")
+            singleB <- !is.null(singleB) && singleB
+            
+            singleC <- attr(C, "Csingle")
+            singleC <- !is.null(singleC) && singleC
+            
+            if (singleA || singleB || singleC) {
+                attr(result, "Csingle") <- TRUE
+            }
+
+            return(result)
         }
         
     } else if (blas$type == "clBLAS") {

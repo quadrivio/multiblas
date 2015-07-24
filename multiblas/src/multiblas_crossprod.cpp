@@ -407,7 +407,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
         float *outMatrix = (float *)calloc(ncol * ncol, sizeof(float));
         
         if (inMatrix == nullptr || outMatrix == nullptr) {
-            Rf_error("crossprod_naive_C: insufficient memory");
+            Rf_error("crossprod_clblas_C: insufficient memory");
             
         } else {
             float *p = inMatrix;
@@ -437,6 +437,11 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
         
     } else {
         errorStatus = crossprod_clblas_d(device_id, x, REAL(result), dims[0], dims[1]);
+    }
+    
+    if (gTrace) {
+        CERR << "ErrorStatus('" << clErrorToString(errorStatus.error) << "', '" <<
+            clblasErrorToString(errorStatus.status) << "')" << endl;
     }
     
     if (errorStatus.error != CL_SUCCESS) {

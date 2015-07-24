@@ -22,13 +22,13 @@ void gemm_blas_d(const double *inMatrixA, int nrowA, int ncolA, bool transposeA,
     const CBLAS_TRANSPOSE transA = transposeA ? CblasTrans : CblasNoTrans;
     const CBLAS_TRANSPOSE transB = transposeB ? CblasTrans : CblasNoTrans;
     
-    const int lda = nrowA;  // first dimension of A (rows), before any transpose
-    const int ldb = nrowB;  // first dimension of B (rows), before any transpose
-    const int ldc = transA ? ncolA : nrowA;  // first dimension of C (rows)
+    const int lda = nrowA;                  // first dimension of A (rows), before any transpose
+    const int ldb = nrowB;                  // first dimension of B (rows), before any transpose
+    const int ldc = transA ? ncolA : nrowA; // first dimension of C (rows)
     
-    const int M = transA ? ncolA : nrowA;    // rows in A (after transpose, if any) and C
-    const int N = transB ? nrowB : ncolB;    // cols in B (after transpose, if any) and C
-    const int K = transA ? nrowA : ncolA;    // cols in A and rows in B (after transposes, if any)
+    const int M = transA ? ncolA : nrowA;   // rows in A (after transpose, if any) and C
+    const int N = transB ? nrowB : ncolB;   // cols in B (after transpose, if any) and C
+    const int K = transA ? nrowA : ncolA;   // cols in A and rows in B (after transposes, if any)
     
     cblas_dgemm(order, transA, transB, M, N, K, alpha, inMatrixA, lda, inMatrixB, ldb, beta, outMatrix, ldc);
 }
