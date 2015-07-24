@@ -9,6 +9,7 @@
 #include "multiblas.h"
 #include "opencl_info.h"
 #include "crossprod_opencl.h"
+#include "gemm_opencl.h"
 
 #if defined(__APPLE__)
 #include <OpenCL/opencl.h>
@@ -1542,7 +1543,6 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
 #endif
     
     return(result);
-
 }
 
 SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_queue,
@@ -1552,11 +1552,804 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                         SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host,
                         SEXP s_verbose)
 {
-    SEXP result = PROTECT(Rf_allocVector(INTSXP, 1));
-    *INTEGER(result) = NA_INTEGER;
-    UNPROTECT(1);
+//    SEXP flee = PROTECT(Rf_allocVector(INTSXP, 1));
+//    *INTEGER(flee) = NA_INTEGER;
+//    UNPROTECT(1);
+//    
+//    return flee;
     
-    return result;
+#ifdef USE_TIMING
+    steady_clock::time_point start_time = steady_clock::now();
+#endif
+    
+    if (gTrace) CERR << "opencl_calc_x_C" << endl;
+    
+    int resultUnprotectCount = 0;
+    
+    // --------------- verify arg types ---------------
+    
+    {
+        SEXP contextClass;
+        PROTECT(contextClass = Rf_getAttrib(s_context, R_ClassSymbol));
+        
+        if (!Rf_isNull(contextClass) && strcmp("opencl.context", CHAR(STRING_ELT(contextClass, 0))) != 0) {
+            error("opencl_calc_x_C: wrong context class");
+        }
+        
+        UNPROTECT(1);
+    }
+    
+    if (!Rf_isNull(s_kernel_f))
+    {
+        SEXP kernelClass;
+        PROTECT(kernelClass = Rf_getAttrib(s_kernel_f, R_ClassSymbol));
+        
+        if (!Rf_isNull(kernelClass) && strcmp("opencl.kernel", CHAR(STRING_ELT(kernelClass, 0))) != 0) {
+            error("opencl_calc_x_C: wrong kernel_f class");
+        }
+        
+        UNPROTECT(1);
+    }
+    
+    if (!Rf_isNull(s_kernel_d))
+    {
+        SEXP kernelClass;
+        PROTECT(kernelClass = Rf_getAttrib(s_kernel_d, R_ClassSymbol));
+        
+        if (!Rf_isNull(kernelClass) && strcmp("opencl.kernel", CHAR(STRING_ELT(kernelClass, 0))) != 0) {
+            error("opencl_calc_x_C: wrong kernel_d class");
+        }
+        
+        UNPROTECT(1);
+    }
+    
+    {
+        SEXP queueClass;
+        PROTECT(queueClass = Rf_getAttrib(s_queue, R_ClassSymbol));
+        
+        if (!Rf_isNull(queueClass) && strcmp("opencl.queue", CHAR(STRING_ELT(queueClass, 0))) != 0) {
+            error("opencl_calc_x_C: wrong queue class");
+        }
+        
+        UNPROTECT(1);
+    }
+    
+    // s_A
+    
+    if (Rf_isComplex(s_A)) {
+        error("gemm_naive_C: complex A not implemented yet");
+        
+    } else if (Rf_isInteger(s_A)) {
+        error("gemm_naive_C: integer A not implemented yet");
+        
+    } else if (!Rf_isReal(s_A) && !Rf_isInteger(s_A)) {
+        error("gemm_naive_C: wrong A type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_A) = " << XLENGTH(s_A) << endl;
+    
+    SEXP s_dims_A;
+    PROTECT(s_dims_A = Rf_getAttrib(s_A, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    if (Rf_isNull(s_dims_A)) {
+        error("gemm_naive_C: no A dimensions");
+    }
+    
+    SEXP s_float_A;
+    PROTECT(s_float_A = Rf_getAttrib(s_A, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloatA = !Rf_isNull(s_float_A) && *LOGICAL(s_float_A);
+    
+    int dimCountA = Rf_length(s_dims_A);
+    int *dimsA = INTEGER(s_dims_A);
+    
+    if (gTrace) {
+        CERR << "dimsA = ";
+        for (int k = 0; k < dimCountA; k++) {
+            CERR << dimsA[k] << " ";
+        }
+        CERR << endl;
+    }
+    
+    if (dimCountA != 2) {
+        error("gemm_naive_C: wrong A dimension");
+    }
+    
+    // s_B
+    
+    if (Rf_isComplex(s_B)) {
+        error("gemm_naive_C: complex B not implemented yet");
+        
+    } else if (Rf_isInteger(s_B)) {
+        error("gemm_naive_C: integer B not implemented yet");
+        
+    } else if (!Rf_isReal(s_B) && !Rf_isInteger(s_B)) {
+        error("gemm_naive_C: wrong B type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_B) = " << XLENGTH(s_B) << endl;
+    
+    SEXP s_dims_B;
+    PROTECT(s_dims_B = Rf_getAttrib(s_B, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    if (Rf_isNull(s_dims_B)) {
+        error("gemm_naive_C: no B dimensions");
+    }
+    
+    SEXP s_float_B;
+    PROTECT(s_float_B = Rf_getAttrib(s_B, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloatB = !Rf_isNull(s_float_B) && *LOGICAL(s_float_B);
+    
+    int dimCountB = Rf_length(s_dims_B);
+    int *dimsB = INTEGER(s_dims_B);
+    
+    if (gTrace) {
+        CERR << "dimsB = ";
+        for (int k = 0; k < dimCountB; k++) {
+            CERR << dimsB[k] << " ";
+        }
+        CERR << endl;
+    }
+    
+    if (dimCountB != 2) {
+        error("gemm_naive_C: wrong B dimension");
+    }
+    
+    // s_C
+    
+    bool cIsNA = false;
+    
+    if (Rf_isLogical(s_C) && XLENGTH(s_C) > 0 && *LOGICAL(s_C) == NA_LOGICAL) {
+        cIsNA = true;
+        
+    } else if (Rf_isComplex(s_C)) {
+        error("gemm_naive_C: complex C not implemented yet");
+        
+    } else if (Rf_isInteger(s_C)) {
+        error("gemm_naive_C: integer C not implemented yet");
+        
+    } else if (!Rf_isReal(s_C) && !Rf_isInteger(s_C)) {
+        error("gemm_naive_C: wrong C type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_C) = " << XLENGTH(s_C) << endl;
+    
+    SEXP s_dims_C;
+    PROTECT(s_dims_C = Rf_getAttrib(s_C, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    int dimCountC = Rf_isNull(s_dims_C) ? 0 : Rf_length(s_dims_C);
+    int *dimsC = Rf_isNull(s_dims_C) ? nullptr : INTEGER(s_dims_C);
+    
+    if (!cIsNA && Rf_isNull(s_dims_C)) {
+        error("gemm_naive_C: no C dimensions");
+    }
+    
+    SEXP s_float_C;
+    PROTECT(s_float_C = Rf_getAttrib(s_C, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloatC = !Rf_isNull(s_float_C) && *LOGICAL(s_float_C);
+    
+    if (gTrace) {
+        if (cIsNA) {
+            CERR << "C = NA" << endl;
+            
+        } else {
+            CERR << "dimsC = ";
+            for (int k = 0; k < dimCountC; k++) {
+                CERR << dimsC[k] << " ";
+            }
+            CERR << endl;
+        }
+    }
+    
+    if (!cIsNA && dimCountC != 2) {
+        error("gemm_naive_C: wrong C dimension");
+    }
+    
+    // others
+    
+    if (!Rf_isReal(s_alpha)) {
+        error("gemm_naive_C: wrong alpha type");
+    }
+    
+    if (!Rf_isReal(s_beta)) {
+        error("gemm_naive_C: wrong beta type");
+    }
+    
+    if (!Rf_isLogical(s_transposeA)) {
+        error("gemm_naive_C: wrong transposeA type");
+    }
+    
+    if (!Rf_isLogical(s_transposeB)) {
+        error("gemm_naive_C: wrong transposeB type");
+    }
+    
+    if (!Rf_isInteger(s_work_item_sizes)) {
+        error("opencl_calc_x_C: wrong work_item_sizes class");
+    }
+    
+    if (!Rf_isInteger(s_row_multiple)) {
+        error("opencl_calc_x_C: wrong row_multiple class");
+    }
+    
+    if (!Rf_isInteger(s_col_multiple)) {
+        error("opencl_calc_x_C: wrong col_multiple class");
+    }
+    
+    if (!Rf_isInteger(s_row_tile_size)) {
+        error("opencl_calc_x_C: wrong row_tile.size class");
+    }
+    
+    if (!Rf_isInteger(s_col_tile_size)) {
+        error("opencl_calc_x_C: wrong col_tile.size class");
+    }
+    
+    bool fillOnHost = !Rf_isNull(s_fill_on_host) && *LOGICAL(s_fill_on_host);
+    
+    bool verbose = !Rf_isNull(s_verbose) && *LOGICAL(s_verbose);
+    
+    // --------------- get args ---------------
+    
+    bool isFloat = isFloatA || isFloatB || isFloatC;
+    
+    cl_context context = (cl_context)R_ExternalPtrAddr(s_context);
+    
+    if (context == nullptr) {
+        error("opencl_calc_x_C: null context");
+    }
+    
+    cl_kernel kernel_f = Rf_isNull(s_kernel_f) ? nullptr : (cl_kernel)R_ExternalPtrAddr(s_kernel_f);
+    
+    if (isFloat && kernel_f == nullptr) {
+        error("opencl_calc_x_C: null kernel_f");
+    }
+    
+    cl_kernel kernel_d = Rf_isNull(s_kernel_d) ? nullptr : (cl_kernel)R_ExternalPtrAddr(s_kernel_d);
+    
+    if (!isFloat && kernel_d == nullptr) {
+        error("opencl_calc_x_C: null kernel_d");
+    }
+    
+    cl_command_queue queue = (cl_command_queue)R_ExternalPtrAddr(s_queue);
+    
+    double *A = REAL(s_A);
+    double *B = REAL(s_B);
+    double *C = cIsNA ? nullptr : REAL(s_C);
+    
+    if (gTrace && XLENGTH(s_A) <= 256) {
+        for (int k = 0; k < XLENGTH(s_A); k++) {
+            CERR << "A[" << k << "] = " << A[k] << endl;
+        }
+    }
+    
+    double alpha = *REAL(s_alpha);
+    double beta = *REAL(s_beta);
+    
+    bool transposeA = !Rf_isNull(s_transposeA) && *LOGICAL(s_transposeA);
+    bool transposeB = !Rf_isNull(s_transposeB) && *LOGICAL(s_transposeB);
+    
+    int *p = INTEGER(s_work_item_sizes);
+    vector<size_t> work_item_sizes;
+    work_item_sizes.push_back(XLENGTH(s_work_item_sizes) > 0 ? p[0] : 1);
+    work_item_sizes.push_back(XLENGTH(s_work_item_sizes) > 1 ? p[1] : 1);
+    work_item_sizes.push_back(XLENGTH(s_work_item_sizes) > 2 ? p[2] : 1);
+    
+    int row_multiple = *INTEGER(s_row_multiple);
+    int col_multiple = *INTEGER(s_col_multiple);
+    
+    int row_tile_size = *INTEGER(s_row_tile_size);
+    int col_tile_size = *INTEGER(s_col_tile_size);
+    
+    // --------------- calculate results ---------------
+    
+    if (isFloat && kernel_f == nullptr) {
+        error("float kernel not available");
+    }
+    
+    if (!isFloat && kernel_d == nullptr) {
+        error("double kernel not available");
+    }
+    
+    size_t nrowA = dimsA[0];
+    size_t ncolA = dimsA[1];
+    
+    size_t nrowB = dimsB[0];
+    size_t ncolB = dimsB[1];
+    
+    size_t outRow = transposeA ? ncolA : nrowA;
+    size_t outCol = transposeB ? nrowB : ncolB;
+    
+    SEXP result;
+    PROTECT(result = Rf_allocVector(REALSXP, outRow * outCol));
+    resultUnprotectCount++;
+    
+    SEXP s_out_dims;
+    PROTECT(s_out_dims = Rf_allocVector(INTSXP, 2));
+    resultUnprotectCount++;
+    
+    INTEGER(s_out_dims)[0] = (int)outRow;
+    INTEGER(s_out_dims)[1] = (int)outCol;
+    Rf_setAttrib(result, R_DimSymbol, s_out_dims);
+    
+    if (isFloatA || isFloatB || isFloatC) {
+        Rf_setAttrib(result, Rf_install("Csingle"), Rf_ScalarLogical(1));
+    }
+    
+    cl_int err = CL_SUCCESS;
+    
+    
+    // matrix A
+    
+    size_t full_nrowA = row_multiple * ((nrowA + row_multiple - 1) / row_multiple);
+    
+    // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
+    size_t gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
+    while (gcd > 1 && col_tile_size % gcd != 0 && row_tile_size % gcd != 0) gcd--;
+    size_t lcm = col_tile_size * row_tile_size / gcd;
+    
+    size_t full_ncolA = (ncolA + lcm - 1) / lcm;
+    
+    full_ncolA = work_item_sizes[0] * ((full_ncolA + work_item_sizes[0] - 1) / work_item_sizes[0]);
+    full_ncolA = work_item_sizes[1] * ((full_ncolA + work_item_sizes[1] - 1) / work_item_sizes[1]);
+    
+    full_ncolA *= lcm;
+    full_ncolA = col_multiple * ((full_ncolA + col_multiple - 1) / col_multiple);
+    
+    if (gTrace) {
+        CERR << "opencl_calc_x: nrowA = " << nrowA << ", ncolA = " << ncolA << ", full_nrowA = " << full_nrowA << ", full_ncolA = " << full_ncolA << std::endl;
+    }
+    
+    // matrix B
+    
+    size_t full_nrowB = row_multiple * ((nrowB + row_multiple - 1) / row_multiple);
+    
+    // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
+    gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
+    while (gcd > 1 && col_tile_size % gcd != 0 && row_tile_size % gcd != 0) gcd--;
+    lcm = col_tile_size * row_tile_size / gcd;
+    
+    size_t full_ncolB = (ncolB + lcm - 1) / lcm;
+    
+    full_ncolB = work_item_sizes[0] * ((full_ncolB + work_item_sizes[0] - 1) / work_item_sizes[0]);
+    full_ncolB = work_item_sizes[1] * ((full_ncolB + work_item_sizes[1] - 1) / work_item_sizes[1]);
+    
+    full_ncolB *= lcm;
+    full_ncolB = col_multiple * ((full_ncolB + col_multiple - 1) / col_multiple);
+    
+    if (gTrace) {
+        CERR << "opencl_calc_x: nrowB = " << nrowB << ", ncolB = " << ncolB << ", full_nrowB = " << full_nrowB << ", full_ncolB = " << full_ncolB << std::endl;
+    }
+    
+    // matrix out
+    
+    size_t full_nrow_out = transposeA ? full_ncolA : full_nrowA;
+    size_t full_ncol_out = transposeB ? full_nrowB : full_ncolB;
+    
+    bool needsFill = nrowA != full_nrowA || ncolA != full_ncolA || nrowB != full_nrowB || ncolB != full_ncolB;
+    
+    if (gTrace) {
+        CERR << setprecision(12);
+    }
+    
+    if (gTrace && nrowA * ncolA <= 256) {
+        CERR << "A:" << endl;
+        for (size_t row = 0; row < nrowA; row++) {
+            for (size_t col = 0; col < ncolA; col++) {
+                CERR << A[row + col * nrowA] << "\t";
+            }
+            CERR << endl;
+        }
+        CERR << endl;
+    }
+    
+    if (needsFill && fillOnHost) {
+        
+        if (isFloat) {
+            if (gTrace) {
+                CERR << "needsFill && fillOnHost && isFloat" << endl;
+            }
+            
+            float *inMatrixA = (float *)calloc(full_nrowA * full_ncolA, sizeof(float));
+            float *inMatrixB = (float *)calloc(full_nrowB * full_ncolB, sizeof(float));
+            float *outMatrix = (float *)calloc(full_nrow_out * full_ncol_out, sizeof(float));
+            
+            if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
+                error("crossprod_naive_C: insufficient memory");
+                
+            } else {
+                for (size_t col = 0; col < ncolA; col++) {
+                    float *p = inMatrixA + col * full_nrowA;
+                    double *q = A + col * nrowA;
+                    for (size_t row = 0; row < nrowA; row++) {
+                        *p++ = (float)*q++;
+                    }
+                    for (size_t row = nrowA; row < full_nrowA; row++) {
+                        *p++ = 0.0;
+                    }
+                }
+                for (size_t col = ncolA; col < full_ncolA; col++) {
+                    float *p = inMatrixA + col * full_nrowA;
+                    for (size_t row = 0; row < full_nrowA; row++) {
+                        *p++ = 0;
+                    }
+                }
+                
+                for (size_t col = 0; col < ncolB; col++) {
+                    float *p = inMatrixB + col * full_nrowB;
+                    double *q = B + col * nrowB;
+                    for (size_t row = 0; row < nrowB; row++) {
+                        *p++ = (float)*q++;
+                    }
+                    for (size_t row = nrowB; row < full_nrowB; row++) {
+                        *p++ = 0.0;
+                    }
+                }
+                for (size_t col = ncolB; col < full_ncolB; col++) {
+                    float *p = inMatrixB + col * full_nrowB;
+                    for (size_t row = 0; row < full_nrowB; row++) {
+                        *p++ = 0;
+                    }
+                }
+                
+                if (C == nullptr) {
+                    memset(outMatrix, 0, full_nrow_out * full_ncol_out * sizeof(float));
+                    
+                } else {
+                    for (size_t col = 0; col < outCol; col++) {
+                        float *p = outMatrix + col * full_nrow_out;
+                        double *q = C + col * outRow;
+                        for (size_t row = 0; row < outRow; row++) {
+                            *p++ = (float)*q++;
+                        }
+                        for (size_t row = outRow; row < full_nrow_out; row++) {
+                            *p++ = 0.0;
+                        }
+                    }
+                    for (size_t col = outRow; col < full_ncol_out; col++) {
+                        float *p = outMatrix + col * full_nrow_out;
+                        for (size_t row = 0; row < full_nrow_out; row++) {
+                            *p++ = 0;
+                        }
+                    }
+                }
+                
+                if (gTrace && nrowA * ncolA <= 256) {
+                    CERR << "inMatrixA:" << endl;
+                    for (size_t row = 0; row < full_nrowA; row++) {
+                        for (size_t col = 0; col < full_ncolA; col++) {
+                            CERR << inMatrixA[row + col * full_nrowA] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                err = opencl_calc_gemm(context, kernel_f, kernel_d, isFloat, queue,
+                                       inMatrixA, (int)nrowA, (int)ncolA, transposeA,
+                                       inMatrixB, (int)nrowB, (int)ncolB, transposeB,
+                                       alpha, beta, outMatrix,
+                                       work_item_sizes, row_multiple, col_multiple,
+                                       row_tile_size, col_tile_size, verbose);
+                
+                if (gTrace && outCol <= 16) {
+                    CERR << "outMatrix:" << endl;
+                    for (size_t row = 0; row < full_nrow_out; row++) {
+                        for (size_t col = 0; col < full_ncol_out; col++) {
+                            CERR << outMatrix[row + col * full_ncol_out] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                for (size_t col = 0; col < outCol; col++) {
+                    float *p = outMatrix + col * full_ncol_out;
+                    double *q = REAL(result) + col * outRow;
+                    for (size_t row = 0; row < outRow; row++) {
+                        *q++ = (double)*p++;
+                    }
+                }
+            }
+            
+            if (inMatrixA != nullptr) {
+                free(inMatrixA);
+                inMatrixA = nullptr;
+            }
+            
+            if (inMatrixB != nullptr) {
+                free(inMatrixB);
+                inMatrixB = nullptr;
+            }
+            
+            if (outMatrix != nullptr) {
+                free(outMatrix);
+                outMatrix = nullptr;
+            }
+            
+        } else {
+            if (gTrace) {
+                CERR << "needsFill && fillOnHost && !isFloat" << endl;
+            }
+            
+            double *inMatrixA = (double *)calloc(full_nrowA * full_ncolA, sizeof(double));
+            double *inMatrixB = (double *)calloc(full_nrowB * full_ncolB, sizeof(double));
+            double *outMatrix = (double *)calloc(full_nrow_out * full_ncol_out, sizeof(double));
+            
+            if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
+                error("crossprod_naive_C: insufficient memory");
+                
+            } else {
+                for (size_t col = 0; col < ncolA; col++) {
+                    double *p = inMatrixA + col * full_nrowA;
+                    double *q = A + col * nrowA;
+                    for (size_t row = 0; row < nrowA; row++) {
+                        *p++ = *q++;
+                    }
+                    for (size_t row = nrowA; row < full_nrowA; row++) {
+                        *p++ = 0.0;
+                    }
+                }
+                for (size_t col = ncolA; col < full_ncolA; col++) {
+                    double *p = inMatrixA + col * full_nrowA;
+                    for (size_t row = 0; row < full_nrowA; row++) {
+                        *p++ = 0;
+                    }
+                }
+                
+                for (size_t col = 0; col < ncolB; col++) {
+                    double *p = inMatrixB + col * full_nrowB;
+                    double *q = B + col * nrowB;
+                    for (size_t row = 0; row < nrowB; row++) {
+                        *p++ = *q++;
+                    }
+                    for (size_t row = nrowB; row < full_nrowB; row++) {
+                        *p++ = 0.0;
+                    }
+                }
+                for (size_t col = ncolB; col < full_ncolB; col++) {
+                    double *p = inMatrixB + col * full_nrowB;
+                    for (size_t row = 0; row < full_nrowB; row++) {
+                        *p++ = 0;
+                    }
+                }
+                
+                if (C == nullptr) {
+                    memset(outMatrix, 0, full_nrow_out * full_ncol_out * sizeof(double));
+                    
+                } else {
+                    for (size_t col = 0; col < outCol; col++) {
+                        double *p = outMatrix + col * full_nrow_out;
+                        double *q = C + col * outRow;
+                        for (size_t row = 0; row < outRow; row++) {
+                            *p++ = *q++;
+                        }
+                        for (size_t row = outRow; row < full_nrow_out; row++) {
+                            *p++ = 0.0;
+                        }
+                    }
+                    for (size_t col = outRow; col < full_ncol_out; col++) {
+                        double *p = outMatrix + col * full_nrow_out;
+                        for (size_t row = 0; row < full_nrow_out; row++) {
+                            *p++ = 0;
+                        }
+                    }
+                }
+                
+                if (gTrace && nrowA * ncolA <= 256) {
+                    CERR << "inMatrixA:" << endl;
+                    for (size_t row = 0; row < full_nrowA; row++) {
+                        for (size_t col = 0; col < full_ncolA; col++) {
+                            CERR << inMatrixA[row + col * full_nrowA] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                err = opencl_calc_gemm(context, kernel_f, kernel_d, isFloat, queue,
+                                       inMatrixA, (int)nrowA, (int)ncolA, transposeA,
+                                       inMatrixB, (int)nrowB, (int)ncolB, transposeB,
+                                       alpha, beta, outMatrix,
+                                       work_item_sizes, row_multiple, col_multiple,
+                                       row_tile_size, col_tile_size, verbose);
+                
+                if (gTrace && outCol <= 16) {
+                    CERR << "outMatrix:" << endl;
+                    for (size_t row = 0; row < full_nrow_out; row++) {
+                        for (size_t col = 0; col < full_ncol_out; col++) {
+                            CERR << outMatrix[row + col * full_ncol_out] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                for (size_t col = 0; col < outCol; col++) {
+                    double *p = outMatrix + col * full_ncol_out;
+                    double *q = REAL(result) + col * outRow;
+                    for (size_t row = 0; row < outRow; row++) {
+                        *q++ = (double)*p++;
+                    }
+                }
+            }
+            
+            if (inMatrixA != nullptr) {
+                free(inMatrixA);
+                inMatrixA = nullptr;
+            }
+            
+            if (inMatrixB != nullptr) {
+                free(inMatrixB);
+                inMatrixB = nullptr;
+            }
+            
+            if (outMatrix != nullptr) {
+                free(outMatrix);
+                outMatrix = nullptr;
+            }
+        }
+        
+    } else {
+        if (isFloat) {
+            if (gTrace) {
+                CERR << "!(needsFill && fillOnHost) && isFloat" << endl;
+            }
+            
+            float *inMatrixA = (float *)calloc(nrowA * ncolA, sizeof(float));
+            float *inMatrixB = (float *)calloc(nrowB * ncolB, sizeof(float));
+            float *outMatrix = (float *)calloc(outRow * outCol, sizeof(float));
+            
+            if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
+                error("crossprod_naive_C: insufficient memory");
+                
+            } else {
+                {
+                    float *p = inMatrixA;
+                    double *q = A;
+                    for (size_t k = 0; k < nrowA * ncolA; k++) {
+                        *p++ = (float)*q++;
+                    }
+                }
+                
+                {
+                    float *p = inMatrixB;
+                    double *q = B;
+                    for (size_t k = 0; k < nrowB * ncolB; k++) {
+                        *p++ = (float)*q++;
+                    }
+                }
+
+                if (C == nullptr) {
+                    memset(outMatrix, 0, outRow * outCol * sizeof(double));
+                    
+                } else {
+                    float *p = outMatrix;
+                    double *q = C;
+                    for (size_t k = 0; k < outRow * outCol; k++) {
+                        *p++ = (float)*q++;
+                    }
+                }
+
+                if (gTrace && nrowA * ncolA <= 256) {
+                    CERR << "inMatrixA:" << endl;
+                    for (size_t row = 0; row < nrowA; row++) {
+                        for (size_t col = 0; col < ncolA; col++) {
+                            CERR << inMatrixA[row + col * nrowA] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                err = opencl_calc_gemm(context, kernel_f, kernel_d, isFloat, queue,
+                                       inMatrixA, (int)nrowA, (int)ncolA, transposeA,
+                                       inMatrixB, (int)nrowB, (int)ncolB, transposeB,
+                                       alpha, beta, outMatrix,
+                                       work_item_sizes, row_multiple, col_multiple,
+                                       row_tile_size, col_tile_size, verbose);
+                
+                if (gTrace && outCol <= 16) {
+                    CERR << "outMatrix:" << endl;
+                    for (size_t row = 0; row < outRow; row++) {
+                        for (size_t col = 0; col < outCol; col++) {
+                            CERR << outMatrix[row + col * outCol] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                for (size_t col = 0; col < outCol; col++) {
+                    float *p = outMatrix + col * outCol;
+                    double *q = REAL(result) + col * outRow;
+                    for (size_t row = 0; row < outRow; row++) {
+                        *q++ = (double)*p++;
+                    }
+                }
+            }
+            
+            if (inMatrixA != nullptr) {
+                free(inMatrixA);
+                inMatrixA = nullptr;
+            }
+            
+            if (inMatrixB != nullptr) {
+                free(inMatrixB);
+                inMatrixB = nullptr;
+            }
+            
+            if (outMatrix != nullptr) {
+                free(outMatrix);
+                outMatrix = nullptr;
+            }
+            
+        } else {
+            if (gTrace) {
+                CERR << "!(needsFill && fillOnHost) && !isFloat" << endl;
+            }
+            
+            if (C == nullptr) {
+                memset(REAL(result), 0, outRow * outCol * sizeof(double));
+                
+            } else {
+                double *p = REAL(result);
+                double *q = C;
+                for (size_t k = 0; k < outRow * outCol; k++) {
+                    *p++ = *q++;
+                }
+            }
+            
+            err = opencl_calc_gemm(context, kernel_f, kernel_d, isFloat, queue,
+                                   A, (int)nrowA, (int)ncolA, transposeA,
+                                   B, (int)nrowB, (int)ncolB, transposeB,
+                                   alpha, beta, REAL(result),
+                                   work_item_sizes, row_multiple, col_multiple,
+                                   row_tile_size, col_tile_size, verbose);
+        }
+    }
+    
+    if (gTrace && outRow * outCol <= 256) {
+        CERR << "result:" << endl;
+        for (size_t row = 0; row < outRow; row++) {
+            for (size_t col = 0; col < outCol; col++) {
+                CERR << REAL(result)[row + col * outRow] << "\t";
+            }
+            CERR << endl;
+        }
+        CERR << endl;
+    }
+    
+    if (err != CL_SUCCESS) {
+        error(clErrorToString(err).c_str());
+    }
+    
+    // ---------------------------------------------------------------------------------------------
+    
+    UNPROTECT(resultUnprotectCount);
+    
+    if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+    
+#ifdef USE_TIMING
+    steady_clock::time_point end_time = steady_clock::now();
+    duration<double> time_span = duration_cast<duration<double> >(end_time - start_time);
+    
+    double nsec = std::chrono::duration_cast<std::chrono::nanoseconds> (end_time - start_time).count();
+    double gflops = (2.0 * nrow * (ncol + 0.5 * (ncol - 1.0) * ncol)) / nsec;
+    
+    if (gTrace || verbose) {
+        CERR << "opencl_calc_x_C Elapsed: " << time_span.count() << " sec " <<
+        gflops << " GFLOPS" << std::endl;
+    }
+#endif
+    
+    return(result);
 }
 
 #endif
