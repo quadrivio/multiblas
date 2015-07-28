@@ -156,17 +156,17 @@ ErrorStatus gemm_clblas(cl_device_id device, const void *inMatrixA, int nrowA, i
     }
     
     // ++++++++++++
-    const clblasOrder order = clblasColumnMajor;
-    const clblasTranspose transA = transposeA ? clblasTrans : clblasNoTrans;
-    const clblasTranspose transB = transposeB ? clblasTrans : clblasNoTrans;
-
     const int lda = nrowA;  // first dimension of A (rows), before any transpose
     const int ldb = nrowB;  // first dimension of B (rows), before any transpose
     const int ldc = nrowC;      // first dimension of C (rows)
     
-    const int M = transA ? ncolA : nrowA;    // rows in A (after transpose, if any) and C
-    const int N = transB ? nrowB : ncolB;    // cols in B (after transpose, if any) and C
-    const int K = transA ? nrowA : ncolA;    // cols in A and rows in B (after transposes, if any)
+    const int M = transposeA ? ncolA : nrowA;    // rows in A (after transpose, if any) and C
+    const int N = transposeB ? nrowB : ncolB;    // cols in B (after transpose, if any) and C
+    const int K = transposeA ? nrowA : ncolA;    // cols in A and rows in B (after transposes, if any)
+    
+    const clblasOrder order = clblasColumnMajor;
+    const clblasTranspose transA = transposeA ? clblasTrans : clblasNoTrans;
+    const clblasTranspose transB = transposeB ? clblasTrans : clblasNoTrans;
     
     cl_event event = NULL;
     

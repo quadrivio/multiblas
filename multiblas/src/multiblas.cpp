@@ -1573,7 +1573,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
         PROTECT(contextClass = Rf_getAttrib(s_context, R_ClassSymbol));
         
         if (!Rf_isNull(contextClass) && strcmp("opencl.context", CHAR(STRING_ELT(contextClass, 0))) != 0) {
-            error("opencl_calc_x_C: wrong context class");
+            error("opencl_calc_gemm_C: wrong context class");
         }
         
         UNPROTECT(1);
@@ -1585,7 +1585,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
         PROTECT(kernelClass = Rf_getAttrib(s_kernel_f, R_ClassSymbol));
         
         if (!Rf_isNull(kernelClass) && strcmp("opencl.kernel", CHAR(STRING_ELT(kernelClass, 0))) != 0) {
-            error("opencl_calc_x_C: wrong kernel_f class");
+            error("opencl_calc_gemm_C: wrong kernel_f class");
         }
         
         UNPROTECT(1);
@@ -1597,7 +1597,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
         PROTECT(kernelClass = Rf_getAttrib(s_kernel_d, R_ClassSymbol));
         
         if (!Rf_isNull(kernelClass) && strcmp("opencl.kernel", CHAR(STRING_ELT(kernelClass, 0))) != 0) {
-            error("opencl_calc_x_C: wrong kernel_d class");
+            error("opencl_calc_gemm_C: wrong kernel_d class");
         }
         
         UNPROTECT(1);
@@ -1608,7 +1608,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
         PROTECT(queueClass = Rf_getAttrib(s_queue, R_ClassSymbol));
         
         if (!Rf_isNull(queueClass) && strcmp("opencl.queue", CHAR(STRING_ELT(queueClass, 0))) != 0) {
-            error("opencl_calc_x_C: wrong queue class");
+            error("opencl_calc_gemm_C: wrong queue class");
         }
         
         UNPROTECT(1);
@@ -1617,13 +1617,13 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     // s_A
     
     if (Rf_isComplex(s_A)) {
-        error("gemm_naive_C: complex A not implemented yet");
+        error("opencl_calc_gemm_C: complex A not implemented yet");
         
     } else if (Rf_isInteger(s_A)) {
-        error("gemm_naive_C: integer A not implemented yet");
+        error("opencl_calc_gemm_C: integer A not implemented yet");
         
     } else if (!Rf_isReal(s_A) && !Rf_isInteger(s_A)) {
-        error("gemm_naive_C: wrong A type");
+        error("opencl_calc_gemm_C: wrong A type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_A) = " << XLENGTH(s_A) << endl;
@@ -1633,7 +1633,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims_A)) {
-        error("gemm_naive_C: no A dimensions");
+        error("opencl_calc_gemm_C: no A dimensions");
     }
     
     SEXP s_float_A;
@@ -1654,19 +1654,19 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     }
     
     if (dimCountA != 2) {
-        error("gemm_naive_C: wrong A dimension");
+        error("opencl_calc_gemm_C: wrong A dimension");
     }
     
     // s_B
     
     if (Rf_isComplex(s_B)) {
-        error("gemm_naive_C: complex B not implemented yet");
+        error("opencl_calc_gemm_C: complex B not implemented yet");
         
     } else if (Rf_isInteger(s_B)) {
-        error("gemm_naive_C: integer B not implemented yet");
+        error("opencl_calc_gemm_C: integer B not implemented yet");
         
     } else if (!Rf_isReal(s_B) && !Rf_isInteger(s_B)) {
-        error("gemm_naive_C: wrong B type");
+        error("opencl_calc_gemm_C: wrong B type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_B) = " << XLENGTH(s_B) << endl;
@@ -1676,7 +1676,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims_B)) {
-        error("gemm_naive_C: no B dimensions");
+        error("opencl_calc_gemm_C: no B dimensions");
     }
     
     SEXP s_float_B;
@@ -1697,7 +1697,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     }
     
     if (dimCountB != 2) {
-        error("gemm_naive_C: wrong B dimension");
+        error("opencl_calc_gemm_C: wrong B dimension");
     }
     
     // s_C
@@ -1708,13 +1708,13 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
         cIsNA = true;
         
     } else if (Rf_isComplex(s_C)) {
-        error("gemm_naive_C: complex C not implemented yet");
+        error("opencl_calc_gemm_C: complex C not implemented yet");
         
     } else if (Rf_isInteger(s_C)) {
-        error("gemm_naive_C: integer C not implemented yet");
+        error("opencl_calc_gemm_C: integer C not implemented yet");
         
     } else if (!Rf_isReal(s_C) && !Rf_isInteger(s_C)) {
-        error("gemm_naive_C: wrong C type");
+        error("opencl_calc_gemm_C: wrong C type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_C) = " << XLENGTH(s_C) << endl;
@@ -1727,7 +1727,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     int *dimsC = Rf_isNull(s_dims_C) ? nullptr : INTEGER(s_dims_C);
     
     if (!cIsNA && Rf_isNull(s_dims_C)) {
-        error("gemm_naive_C: no C dimensions");
+        error("opencl_calc_gemm_C: no C dimensions");
     }
     
     SEXP s_float_C;
@@ -1750,45 +1750,45 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     }
     
     if (!cIsNA && dimCountC != 2) {
-        error("gemm_naive_C: wrong C dimension");
+        error("opencl_calc_gemm_C: wrong C dimension");
     }
     
     // others
     
     if (!Rf_isReal(s_alpha)) {
-        error("gemm_naive_C: wrong alpha type");
+        error("opencl_calc_gemm_C: wrong alpha type");
     }
     
     if (!Rf_isReal(s_beta)) {
-        error("gemm_naive_C: wrong beta type");
+        error("opencl_calc_gemm_C: wrong beta type");
     }
     
     if (!Rf_isLogical(s_transposeA)) {
-        error("gemm_naive_C: wrong transposeA type");
+        error("opencl_calc_gemm_C: wrong transposeA type");
     }
     
     if (!Rf_isLogical(s_transposeB)) {
-        error("gemm_naive_C: wrong transposeB type");
+        error("opencl_calc_gemm_C: wrong transposeB type");
     }
     
     if (!Rf_isInteger(s_work_item_sizes)) {
-        error("opencl_calc_x_C: wrong work_item_sizes class");
+        error("opencl_calc_gemm_C: wrong work_item_sizes class");
     }
     
     if (!Rf_isInteger(s_row_multiple)) {
-        error("opencl_calc_x_C: wrong row_multiple class");
+        error("opencl_calc_gemm_C: wrong row_multiple class");
     }
     
     if (!Rf_isInteger(s_col_multiple)) {
-        error("opencl_calc_x_C: wrong col_multiple class");
+        error("opencl_calc_gemm_C: wrong col_multiple class");
     }
     
     if (!Rf_isInteger(s_row_tile_size)) {
-        error("opencl_calc_x_C: wrong row_tile.size class");
+        error("opencl_calc_gemm_C: wrong row_tile.size class");
     }
     
     if (!Rf_isInteger(s_col_tile_size)) {
-        error("opencl_calc_x_C: wrong col_tile.size class");
+        error("opencl_calc_gemm_C: wrong col_tile.size class");
     }
     
     bool fillOnHost = !Rf_isNull(s_fill_on_host) && *LOGICAL(s_fill_on_host);
@@ -1802,26 +1802,26 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     cl_context context = (cl_context)R_ExternalPtrAddr(s_context);
     
     if (context == nullptr) {
-        error("opencl_calc_x_C: null context");
+        error("opencl_calc_gemm_C: null context");
     }
     
     cl_kernel kernel_f = Rf_isNull(s_kernel_f) ? nullptr : (cl_kernel)R_ExternalPtrAddr(s_kernel_f);
     
     if (isFloat && kernel_f == nullptr) {
-        error("opencl_calc_x_C: null kernel_f");
+        error("opencl_calc_gemm_C: null kernel_f");
     }
     
     cl_kernel kernel_d = Rf_isNull(s_kernel_d) ? nullptr : (cl_kernel)R_ExternalPtrAddr(s_kernel_d);
     
     if (!isFloat && kernel_d == nullptr) {
-        error("opencl_calc_x_C: null kernel_d");
+        error("opencl_calc_gemm_C: null kernel_d");
     }
     
     cl_command_queue queue = (cl_command_queue)R_ExternalPtrAddr(s_queue);
     
-    double *A = REAL(s_A);
-    double *B = REAL(s_B);
-    double *C = cIsNA ? nullptr : REAL(s_C);
+    const double *A = REAL(s_A);
+    const double *B = REAL(s_B);
+    const double *C = cIsNA ? nullptr : REAL(s_C);
     
     if (gTrace && XLENGTH(s_A) <= 256) {
         for (int k = 0; k < XLENGTH(s_A); k++) {
@@ -1850,11 +1850,11 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     // --------------- calculate results ---------------
     
     if (isFloat && kernel_f == nullptr) {
-        error("float kernel not available");
+        error("opencl_calc_gemm_C: float kernel not available");
     }
     
     if (!isFloat && kernel_d == nullptr) {
-        error("double kernel not available");
+        error("opencl_calc_gemm_C: double kernel not available");
     }
     
     size_t nrowA = dimsA[0];
@@ -1865,7 +1865,9 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     
     size_t outRow = transposeA ? ncolA : nrowA;
     size_t outCol = transposeB ? nrowB : ncolB;
-    
+
+//    CERR << "outRow = " << outRow << ", outCol = " << outCol << endl;
+
     SEXP result;
     PROTECT(result = Rf_allocVector(REALSXP, outRow * outCol));
     resultUnprotectCount++;
@@ -1903,7 +1905,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     full_ncolA = col_multiple * ((full_ncolA + col_multiple - 1) / col_multiple);
     
     if (gTrace) {
-        CERR << "opencl_calc_x: nrowA = " << nrowA << ", ncolA = " << ncolA << ", full_nrowA = " << full_nrowA << ", full_ncolA = " << full_ncolA << std::endl;
+        CERR << "opencl_calc_gemm_C: nrowA = " << nrowA << ", ncolA = " << ncolA << ", full_nrowA = " << full_nrowA << ", full_ncolA = " << full_ncolA << std::endl;
     }
     
     // matrix B
@@ -1924,14 +1926,16 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     full_ncolB = col_multiple * ((full_ncolB + col_multiple - 1) / col_multiple);
     
     if (gTrace) {
-        CERR << "opencl_calc_x: nrowB = " << nrowB << ", ncolB = " << ncolB << ", full_nrowB = " << full_nrowB << ", full_ncolB = " << full_ncolB << std::endl;
+        CERR << "opencl_calc_gemm_C: nrowB = " << nrowB << ", ncolB = " << ncolB << ", full_nrowB = " << full_nrowB << ", full_ncolB = " << full_ncolB << std::endl;
     }
     
     // matrix out
     
     size_t full_nrow_out = transposeA ? full_ncolA : full_nrowA;
     size_t full_ncol_out = transposeB ? full_nrowB : full_ncolB;
-    
+
+//    CERR << "full_nrow_out = " << full_nrow_out << ", full_ncol_out = " << full_ncol_out << endl;
+
     bool needsFill = nrowA != full_nrowA || ncolA != full_ncolA || nrowB != full_nrowB || ncolB != full_ncolB;
     
     if (gTrace) {
@@ -1961,12 +1965,12 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
             float *outMatrix = (float *)calloc(full_nrow_out * full_ncol_out, sizeof(float));
             
             if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
-                error("crossprod_naive_C: insufficient memory");
+                error("opencl_calc_gemm_C: insufficient memory");
                 
             } else {
                 for (size_t col = 0; col < ncolA; col++) {
                     float *p = inMatrixA + col * full_nrowA;
-                    double *q = A + col * nrowA;
+                    const double *q = A + col * nrowA;
                     for (size_t row = 0; row < nrowA; row++) {
                         *p++ = (float)*q++;
                     }
@@ -1983,7 +1987,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 
                 for (size_t col = 0; col < ncolB; col++) {
                     float *p = inMatrixB + col * full_nrowB;
-                    double *q = B + col * nrowB;
+                    const double *q = B + col * nrowB;
                     for (size_t row = 0; row < nrowB; row++) {
                         *p++ = (float)*q++;
                     }
@@ -2004,7 +2008,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 } else {
                     for (size_t col = 0; col < outCol; col++) {
                         float *p = outMatrix + col * full_nrow_out;
-                        double *q = C + col * outRow;
+                        const double *q = C + col * outRow;
                         for (size_t row = 0; row < outRow; row++) {
                             *p++ = (float)*q++;
                         }
@@ -2042,7 +2046,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                     CERR << "outMatrix:" << endl;
                     for (size_t row = 0; row < full_nrow_out; row++) {
                         for (size_t col = 0; col < full_ncol_out; col++) {
-                            CERR << outMatrix[row + col * full_ncol_out] << "\t";
+                            CERR << outMatrix[row + col * full_nrow_out] << "\t";
                         }
                         CERR << endl;
                     }
@@ -2050,7 +2054,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 }
                 
                 for (size_t col = 0; col < outCol; col++) {
-                    float *p = outMatrix + col * full_ncol_out;
+                    float *p = outMatrix + col * full_nrow_out;
                     double *q = REAL(result) + col * outRow;
                     for (size_t row = 0; row < outRow; row++) {
                         *q++ = (double)*p++;
@@ -2083,12 +2087,12 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
             double *outMatrix = (double *)calloc(full_nrow_out * full_ncol_out, sizeof(double));
             
             if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
-                error("crossprod_naive_C: insufficient memory");
+                error("opencl_calc_gemm_C: insufficient memory");
                 
             } else {
                 for (size_t col = 0; col < ncolA; col++) {
                     double *p = inMatrixA + col * full_nrowA;
-                    double *q = A + col * nrowA;
+                    const double *q = A + col * nrowA;
                     for (size_t row = 0; row < nrowA; row++) {
                         *p++ = *q++;
                     }
@@ -2105,7 +2109,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 
                 for (size_t col = 0; col < ncolB; col++) {
                     double *p = inMatrixB + col * full_nrowB;
-                    double *q = B + col * nrowB;
+                    const double *q = B + col * nrowB;
                     for (size_t row = 0; row < nrowB; row++) {
                         *p++ = *q++;
                     }
@@ -2126,7 +2130,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 } else {
                     for (size_t col = 0; col < outCol; col++) {
                         double *p = outMatrix + col * full_nrow_out;
-                        double *q = C + col * outRow;
+                        const double *q = C + col * outRow;
                         for (size_t row = 0; row < outRow; row++) {
                             *p++ = *q++;
                         }
@@ -2164,7 +2168,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                     CERR << "outMatrix:" << endl;
                     for (size_t row = 0; row < full_nrow_out; row++) {
                         for (size_t col = 0; col < full_ncol_out; col++) {
-                            CERR << outMatrix[row + col * full_ncol_out] << "\t";
+                            CERR << outMatrix[row + col * full_nrow_out] << "\t";
                         }
                         CERR << endl;
                     }
@@ -2172,7 +2176,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 }
                 
                 for (size_t col = 0; col < outCol; col++) {
-                    double *p = outMatrix + col * full_ncol_out;
+                    double *p = outMatrix + col * full_nrow_out;
                     double *q = REAL(result) + col * outRow;
                     for (size_t row = 0; row < outRow; row++) {
                         *q++ = (double)*p++;
@@ -2207,12 +2211,12 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
             float *outMatrix = (float *)calloc(outRow * outCol, sizeof(float));
             
             if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
-                error("crossprod_naive_C: insufficient memory");
+                error("opencl_calc_gemm_C: insufficient memory");
                 
             } else {
                 {
                     float *p = inMatrixA;
-                    double *q = A;
+                    const double *q = A;
                     for (size_t k = 0; k < nrowA * ncolA; k++) {
                         *p++ = (float)*q++;
                     }
@@ -2220,18 +2224,18 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 
                 {
                     float *p = inMatrixB;
-                    double *q = B;
+                    const double *q = B;
                     for (size_t k = 0; k < nrowB * ncolB; k++) {
                         *p++ = (float)*q++;
                     }
                 }
 
                 if (C == nullptr) {
-                    memset(outMatrix, 0, outRow * outCol * sizeof(double));
+                    memset(outMatrix, 0, outRow * outCol * sizeof(float));
                     
                 } else {
                     float *p = outMatrix;
-                    double *q = C;
+                    const double *q = C;
                     for (size_t k = 0; k < outRow * outCol; k++) {
                         *p++ = (float)*q++;
                     }
@@ -2259,7 +2263,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                     CERR << "outMatrix:" << endl;
                     for (size_t row = 0; row < outRow; row++) {
                         for (size_t col = 0; col < outCol; col++) {
-                            CERR << outMatrix[row + col * outCol] << "\t";
+                            CERR << outMatrix[row + col * outRow] << "\t";
                         }
                         CERR << endl;
                     }
@@ -2267,7 +2271,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 }
                 
                 for (size_t col = 0; col < outCol; col++) {
-                    float *p = outMatrix + col * outCol;
+                    float *p = outMatrix + col * outRow;
                     double *q = REAL(result) + col * outRow;
                     for (size_t row = 0; row < outRow; row++) {
                         *q++ = (double)*p++;
@@ -2300,7 +2304,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                 
             } else {
                 double *p = REAL(result);
-                double *q = C;
+                const double *q = C;
                 for (size_t k = 0; k < outRow * outCol; k++) {
                     *p++ = *q++;
                 }
@@ -2344,7 +2348,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     double gflops = (2.0 * nrow * (ncol + 0.5 * (ncol - 1.0) * ncol)) / nsec;
     
     if (gTrace || verbose) {
-        CERR << "opencl_calc_x_C Elapsed: " << time_span.count() << " sec " <<
+        CERR << "opencl_calc_gemm_C Elapsed: " << time_span.count() << " sec " <<
         gflops << " GFLOPS" << std::endl;
     }
 #endif

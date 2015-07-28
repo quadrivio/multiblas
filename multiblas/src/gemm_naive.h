@@ -19,4 +19,10 @@ void gemm_naive_f(const float *inMatrixA, int nrowA, int ncolA, bool transposeA,
                  const float *inMatrixB, int nrowB, int ncolB, bool transposeB,
                  float alpha, float beta, float *outMatrix);
 
+void transpose_f(const float *from, int nrow, int ncol, float *to);
+void transpose_d(const double *from, int nrow, int ncol, double *to);
+
+void transpose_f(float *x, int nrow, int ncol);
+void transpose_d(double *x, int nrow, int ncol);
+
 #endif /* defined(__multiBLAS_XC__gemm_naive__) */

@@ -9,6 +9,7 @@
 #define R_NO_REMAP  // needed if include fstream
 
 #include "gemm_opencl.h"
+#include "gemm_naive.h"
 #include "opencl_info.h"
 #include "shim.h"
 
@@ -17,6 +18,7 @@
 #endif
 
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <fstream>
@@ -70,11 +72,49 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         CERR << "opencl_calc_gemm( " << (is_float ? "FLOAT" : "DOUBLE") << ")" << std::endl << std::endl;
     }
     
+    int nrowC = transposeA ? ncolA : nrowA;
+    int ncolC = transposeB ? nrowB : ncolB;
+    
+    if (is_float) {
+        for (size_t k = 0; k < nrowC * ncolC; k++) {
+            output_matrix_f[k] = k + 0.1;
+        }
+        
+    } else {
+        for (size_t k = 0; k < nrowC * ncolC; k++) {
+            output_matrix_d[k] = k + 0.1;
+        }
+    }
+    
+    return CL_SUCCESS;
+    
     cl_kernel kernel = is_float ? kernel_f : kernel_d;
     
     cl_int err = CL_SUCCESS;
     
     // ----- inputA -----
+    
+    const void *tmA = inMatrixA;
+    if (err == CL_SUCCESS && !transposeA) {
+        if (is_float) {
+            tmA = calloc(nrowA * ncolA, sizeof(float));
+            if (tmA == nullptr) {
+                err = CL_OUT_OF_HOST_MEMORY;
+                
+            } else {
+                transpose_f((const float *)inMatrixA, nrowA, ncolA, (float *)tmA);
+            }
+            
+        } else {
+            tmA = calloc(nrowA * ncolA, sizeof(double));
+            if (tmA == nullptr) {
+                err = CL_OUT_OF_HOST_MEMORY;
+                
+            } else {
+                transpose_d((const double *)inMatrixA, nrowA, ncolA, (double *)tmA);
+            }
+        }
+    }
     
     size_t full_nrowA = 0;
     size_t full_ncolA = 0;
@@ -83,15 +123,39 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     cl_event fill_in_event2A = nullptr;
     cl_event write_eventA = nullptr;
 
-    err = createAndWriteInput(context, queue,
-                              nrowA, ncolA, row_multiple, col_multiple,
-                              row_tile_size, col_tile_size, work_item_sizes,
-                              inMatrixA, is_float,
-                              full_nrowA, full_ncolA, cl_input_matrixA,
-                              fill_in_event1A, fill_in_event2A, write_eventA);
+    if (err == CL_SUCCESS) {
+        err = createAndWriteInput(context, queue,
+                                  nrowA, ncolA, row_multiple, col_multiple,
+                                  row_tile_size, col_tile_size, work_item_sizes,
+                                  tmA, is_float,
+                                  full_nrowA, full_ncolA, cl_input_matrixA,
+                                  fill_in_event1A, fill_in_event2A, write_eventA);
+    }
 
     // ----- inputB -----
-    
+
+    const void *mB = inMatrixB;
+    if (err == CL_SUCCESS && transposeB) {
+        if (is_float) {
+            mB = calloc(nrowB * ncolB, sizeof(float));
+            if (mB == nullptr) {
+                err = CL_OUT_OF_HOST_MEMORY;
+                
+            } else {
+                transpose_f((const float *)inMatrixB, nrowB, ncolB, (float *)mB);
+            }
+            
+        } else {
+            mB = calloc(nrowB * ncolB, sizeof(double));
+            if (mB == nullptr) {
+                err = CL_OUT_OF_HOST_MEMORY;
+                
+            } else {
+                transpose_d((const double *)inMatrixB, nrowB, ncolB, (double *)mB);
+            }
+        }
+    }
+
     size_t full_nrowB = 0;
     size_t full_ncolB = 0;
     cl_mem cl_input_matrixB = nullptr;
@@ -103,176 +167,11 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         err = createAndWriteInput(context, queue,
                                   nrowB, ncolB, row_multiple, col_multiple,
                                   row_tile_size, col_tile_size, work_item_sizes,
-                                  inMatrixB, is_float,
+                                  mB, is_float,
                                   full_nrowB, full_ncolB, cl_input_matrixB,
                                   fill_in_event1B, fill_in_event2B, write_eventB);
     }
 
-#if 0
-    size_t full_nrow = row_multiple * ((nrow + row_multiple - 1) / row_multiple);
-    
-    // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
-    size_t gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
-    while (gcd > 1 && col_tile_size % gcd != 0 && row_tile_size % gcd != 0) gcd--;
-    size_t lcm = col_tile_size * row_tile_size / gcd;
-    
-    size_t full_ncol = (ncol + lcm - 1) / lcm;
-    
-    full_ncol = work_item_sizes[0] * ((full_ncol + work_item_sizes[0] - 1) / work_item_sizes[0]);
-    full_ncol = work_item_sizes[1] * ((full_ncol + work_item_sizes[1] - 1) / work_item_sizes[1]);
-    
-    full_ncol *= lcm;
-    full_ncol = col_multiple * ((full_ncol + col_multiple - 1) / col_multiple);
-    
-    if (gTrace) {
-        CERR << "opencl_calc_x: nrow = " << nrow << ", ncol = " << ncol << ", full_nrow = " << full_nrow << ", full_ncol = " << full_ncol << std::endl;
-    }
-    
-    // buffers
-    cl_mem cl_input_matrix = NULL;
-    if (err == CL_SUCCESS) {
-        if (gTrace) {
-            CERR << "clCreateBuffer cl_input_matrix:" << std::endl;
-        }
-        
-        if (ncol == full_ncol && nrow == full_nrow) {
-            if (is_float) {
-                cl_input_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                                 nrow * ncol * sizeof(float), input_matrix_f, &err);
-                
-            } else {
-                cl_input_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                                 nrow * ncol * sizeof(double), input_matrix_d, &err);
-            }
-            
-        } else {
-            if (is_float) {
-                cl_input_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY,
-                                                 full_nrow * full_ncol * sizeof(float), nullptr, &err);
-                
-            } else {
-                cl_input_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY,
-                                                 full_nrow * full_ncol * sizeof(double), nullptr, &err);
-            }
-        }
-    }
-    
-    size_t origin[] = { 0, 0, 0 };
-    size_t region_f[] = { nrow * sizeof(float), (size_t)ncol, 1 };
-    size_t region_d[] = { nrow * sizeof(double), (size_t)ncol, 1 };
-    
-    cl_event fill_in_event1 = nullptr;
-    cl_event fill_in_event2 = nullptr;
-    if (err == CL_SUCCESS) {
-        if (ncol != full_ncol || nrow != full_nrow) {
-            if (full_nrow > nrow) {
-                if (gTrace) {
-                    CERR << "clEnqueueWriteBufferRect zeros1" << std::endl;
-                }
-                
-                size_t origin1[] = { nrow, 0, 0 };
-                if (is_float) {
-                    float *zeros1 = (float *)calloc(ncol * (full_nrow - nrow), sizeof(float));
-                    if (zeros1 == nullptr) {
-                        err = CL_OUT_OF_HOST_MEMORY;
-                        
-                    } else {
-                        memset(zeros1, 0, ncol * (full_nrow - nrow) * sizeof(float));
-                        size_t region_f1[] = { (full_nrow - nrow) * sizeof(float), (size_t)ncol, 1 };
-                        
-                        err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin1, origin,
-                                                       region_f1, full_nrow * sizeof(float), 0, (full_nrow - nrow) * sizeof(float),
-                                                       0, zeros1,
-                                                       0, nullptr, &fill_in_event1);
-                        
-                        free(zeros1);
-                    }
-                    
-                    
-                } else {
-                    double *zeros1 = (double *)calloc(ncol * (full_nrow - nrow), sizeof(double));
-                    if (zeros1 == nullptr) {
-                        err = CL_OUT_OF_HOST_MEMORY;
-                        
-                    } else {
-                        memset(zeros1, 0, ncol * (full_nrow - nrow) * sizeof(double));
-                        size_t region_d1[] = { (full_nrow - nrow) * sizeof(double), (size_t)ncol, 1 };
-                        
-                        err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin1, origin,
-                                                       region_d1, full_nrow * sizeof(double), 0, (full_nrow - nrow) * sizeof(double),
-                                                       0, zeros1,
-                                                       0, nullptr, &fill_in_event1);
-                        
-                        free(zeros1);
-                    }
-                }
-            }
-            
-            if (full_ncol > ncol && err == CL_SUCCESS) {
-                if (gTrace) {
-                    CERR << "clEnqueueWriteBufferRect zeros2" << std::endl;
-                }
-                size_t origin2[] = { 0, ncol, 0 };
-                if (is_float) {
-                    float *zeros2 = (float *)calloc(full_nrow * (full_ncol - ncol), sizeof(float));
-                    if (zeros2 == nullptr) {
-                        err = CL_OUT_OF_HOST_MEMORY;
-                        
-                    } else {
-                        memset(zeros2, 0, full_nrow * (full_ncol - ncol) * sizeof(float));
-                        size_t region_f2[] = { full_nrow * sizeof(float), (size_t)(full_ncol - ncol), 1 };
-                        
-                        err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin2, origin,
-                                                       region_f2, full_nrow * sizeof(float), 0, full_nrow * sizeof(float),
-                                                       0, zeros2,
-                                                       0, nullptr, &fill_in_event2);
-                        
-                        free(zeros2);
-                    }
-                    
-                } else {
-                    double *zeros2 = (double *)calloc(full_nrow * (full_ncol - ncol), sizeof(double));
-                    if (zeros2 == nullptr) {
-                        err = CL_OUT_OF_HOST_MEMORY;
-                        
-                    } else {
-                        memset(zeros2, 0, full_nrow * (full_ncol - ncol) * sizeof(double));
-                        size_t region_d2[] = { full_nrow * sizeof(double), (size_t)(full_ncol - ncol), 1 };
-                        
-                        err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin2, origin,
-                                                       region_d2, full_nrow * sizeof(double), 0, full_nrow * sizeof(double),
-                                                       0, zeros2,
-                                                       0, nullptr, &fill_in_event2);
-                        
-                        free(zeros2);
-                    }
-                }
-            }
-        }
-    }
-    
-    cl_event write_event = nullptr;
-    if (err == CL_SUCCESS) {
-        if (ncol != full_ncol || nrow != full_nrow) {
-            if (is_float) {
-                err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin, origin,
-                                               region_f, full_nrow * sizeof(float), 0, nrow * sizeof(float),
-                                               0, input_matrix_f,
-                                               0, nullptr, &write_event);
-                
-            } else {
-                err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin, origin,
-                                               region_d, full_nrow * sizeof(double), 0, nrow * sizeof(double),
-                                               0, input_matrix_d,
-                                               0, nullptr, &write_event);
-            }
-        }
-    }
-#endif
-
-    int nrowC = transposeA ? ncolA : nrowA;
-    int ncolC = transposeB ? nrowB : ncolB;
-    
     size_t full_nrowC = transposeA ? full_ncolA : full_nrowA;
     size_t full_ncolC = transposeB ? full_nrowB : full_ncolB;
 
@@ -298,17 +197,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         if (gTrace) {
             CERR << "Initiate calculation:" << std::endl;
         }
-//        __kernel void gemm_d_naive(__private int inputA_nrow,
-//                                   __private int inputA_ncol,
-//                                   __private int inputB_nrow,
-//                                   __private int inputB_ncol,
-//                                   __private double alpha,
-//                                   __private double beta,
-//                                   __global double* inputAT,
-//                                   __global double* inputB,
-//                                   __global double* output) {
-
-        
         cl_int cl_nrowA = (cl_int)full_nrowA;
         cl_int cl_ncolA = (cl_int)full_ncolA;
         cl_int cl_nrowB = (cl_int)full_nrowB;
@@ -333,7 +221,7 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         clSetKernelArg(kernel, 8, sizeof(cl_mem), &cl_output_matrix);
         
         cl_uint work_dim = 3;
-        size_t global_work_sizes[] = { (size_t)full_ncolC / col_tile_size, (size_t)full_ncolC / row_tile_size, 1 };
+        size_t global_work_sizes[] = { (size_t)full_ncolC / col_tile_size, (size_t)full_nrowC / row_tile_size, 1 };
         
         //cl_event events[] = { /*fill_out_event,*/ write_event };
         std::vector<cl_event> events;
@@ -448,6 +336,14 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         cl_input_matrixB = NULL;
     }
     
+    if (tmA != nullptr && tmA != inMatrixA) {
+        free((void *)tmA);
+    }
+    
+    if (mB != nullptr && mB != inMatrixB) {
+        free((void *)mB);
+    }
+    
 #ifdef USE_TIMING
     steady_clock::time_point end_time = steady_clock::now();
     duration<double> time_span = duration_cast<duration<double> >(end_time - start_time);
@@ -494,7 +390,7 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
     full_ncol = col_multiple * ((full_ncol + col_multiple - 1) / col_multiple);
     
     if (gTrace) {
-        CERR << "opencl_calc_x: nrow = " << nrow << ", ncol = " << ncol << ", full_nrow = " << full_nrow << ", full_ncol = " << full_ncol << std::endl;
+        CERR << "createAndWriteInput: nrow = " << nrow << ", ncol = " << ncol << ", full_nrow = " << full_nrow << ", full_ncol = " << full_ncol << std::endl;
     }
     
     // buffers

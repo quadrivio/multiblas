@@ -488,9 +488,9 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
     
     // --------------- get arg ---------------
     
-    double *A = REAL(s_A);
-    double *B = REAL(s_B);
-    double *C = cIsNA ? nullptr : REAL(s_C);
+    const double *A = REAL(s_A);
+    const double *B = REAL(s_B);
+    const double *C = cIsNA ? nullptr : REAL(s_C);
     
     if (gTrace && XLENGTH(s_A) <= 256) {
         for (int k = 0; k < XLENGTH(s_A); k++) {
@@ -535,7 +535,7 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
             
         } else {
             float *p = inMatrixA;
-            double *q = A;
+            const double *q = A;
             for (size_t k = 0; k < XLENGTH(s_A); k++) {
                 *p++ = (float)*q++;
             }
@@ -560,9 +560,9 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
             gemm_blas_f(inMatrixA, dimsA[0], dimsA[1], transposeA, inMatrixB, dimsB[0], dimsB[1], transposeB, alpha, beta, outMatrix);
             
             p = outMatrix;
-            q = REAL(result);
+            double *qq = REAL(result);
             for (size_t k = 0; k < outRow * outCol; k++) {
-                *q++ = (double)*p++;
+                *qq++ = (double)*p++;
             }
         }
         

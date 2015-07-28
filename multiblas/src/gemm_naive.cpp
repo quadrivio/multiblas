@@ -7,6 +7,10 @@
 //
 
 #include "gemm_naive.h"
+#include "shim.h"
+
+#include <cstdlib>
+#include <string>
 
 void gemm_naive_d(const double *inMatrixA, int nrowA, int ncolA, bool transposeA,
                   const double *inMatrixB, int nrowB, int ncolB, bool transposeB,
@@ -79,3 +83,78 @@ void gemm_naive_f(const float *inMatrixA, int nrowA, int ncolA, bool transposeA,
         }
     }
 }
+
+void transpose_f(float *x, int nrow, int ncol)
+{
+    float *copy = (float *)calloc(nrow * ncol, sizeof(float));
+    if (copy == nullptr) {
+#if RPACKAGE
+        Rf_error("transpose_f: insufficient memory");
+#else
+        throw std::runtime_error("transpose_f: insufficient memory");
+#endif
+    }
+    
+    memcpy(copy, x, nrow * ncol * sizeof(float));
+    transpose_f(copy, nrow, ncol, x);
+//    float *q = copy;
+//    for (size_t col = 0; col < ncol; col++) {
+//        float *p = x + col;
+//        for (size_t row = 0; row < nrow; row++) {
+//            *p = *q++;
+//            p += ncol;
+//        }
+//    }
+    
+    free(copy);
+}
+
+void transpose_f(const float *from, int nrow, int ncol, float *to)
+{
+    const float *q = from;
+    for (size_t col = 0; col < ncol; col++) {
+        float *p = to + col;
+        for (size_t row = 0; row < nrow; row++) {
+            *p = *q++;
+            p += ncol;
+        }
+    }
+}
+
+void transpose_d(const double *from, int nrow, int ncol, double *to)
+{
+    const double *q = from;
+    for (size_t col = 0; col < ncol; col++) {
+        double *p = to + col;
+        for (size_t row = 0; row < nrow; row++) {
+            *p = *q++;
+            p += ncol;
+        }
+    }
+}
+
+void transpose_d(double *x, int nrow, int ncol)
+{
+    double *copy = (double *)calloc(nrow * ncol, sizeof(double));
+    if (copy == nullptr) {
+#if RPACKAGE
+        Rf_error("transpose_f: insufficient memory");
+#else
+        throw std::runtime_error("transpose_f: insufficient memory");
+#endif
+    }
+    
+    memcpy(copy, x, nrow * ncol * sizeof(double));
+    transpose_d(copy, nrow, ncol, x);
+//    double *q = copy;
+//    for (size_t col = 0; col < ncol; col++) {
+//        double *p = x + col;
+//        for (size_t row = 0; row < nrow; row++) {
+//            *p = *q++;
+//            p += ncol;
+//        }
+//    }
+    
+    free(copy);
+}
+

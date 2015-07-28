@@ -8,6 +8,9 @@
 
 #include "crossprod_opencl.h"
 #include "opencl_info.h"
+#include "gemm_naive.h"
+#include "gemm_blas.h"
+#include "gemm_opencl.h"
 #include "utils.h"
 
 #include <chrono>
@@ -22,6 +25,98 @@ using namespace std;
 using namespace std::chrono;
 
 std::string gInstPath("");
+
+void printMatrix_f(float *x, size_t ncol, size_t nrow)
+{
+    for (size_t row = 0; row < nrow; row++) {
+        for (size_t col = 0; col < ncol; col++) {
+            cout << x[col * nrow + row] << "\t";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+int main(int argc, const char * argv[]) {
+    float *a = (float *)calloc(sizeof(float), 3 * 2);
+    for (size_t k = 0; k < 3 * 4; k++) a[k] = k + 1;
+    
+    cout << "a:" << endl;
+    printMatrix_f(a, 3, 2);
+    
+    float *b = (float *)calloc(sizeof(float), 5 * 3);
+    for (size_t k = 0; k < 5 * 3; k++) b[k] = k + 7;
+    
+    cout << "b:" << endl;
+    printMatrix_f(b, 5, 3);
+    
+    float *c = (float *)calloc(sizeof(float), 5 * 2);
+//    gemm_naive_f(a, 2, 3, false, b, 3, 5, false, 1.0, 0.0, c);
+//    gemm_blas_f(a, 2, 3, false, b, 3, 5, false, 1.0, 0.0, c);
+
+    {
+        gInstPath = argv[0];
+        gInstPath = gInstPath.substr(0, gInstPath.find_last_of("/\\"));
+        gInstPath += "/inst";
+        
+        cl_context context = nullptr;
+        cl_kernel kernel_f = nullptr;
+        cl_kernel kernel_d = nullptr;
+        cl_command_queue queue = nullptr;
+        size_t nrowA = 2;
+        size_t ncolA = 3;
+        size_t nrowB = 3;
+        size_t ncolB = 5;
+        bool verbose = false;
+        
+        std::vector<size_t> work_item_sizes;
+        work_item_sizes.push_back(1);
+        work_item_sizes.push_back(1);
+        work_item_sizes.push_back(1);
+        
+        cl_platform_id platform = NULL;
+        clGetPlatformIDs(1, &platform, NULL);
+        
+        cl_device_id gpu_device = nullptr;
+        clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &gpu_device, NULL);
+        
+        context = clCreateContext(NULL, 1, &gpu_device, NULL, NULL, NULL);
+        
+#ifdef CL_VERSION_2_0
+        const cl_queue_properties properties[] = { CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0};
+        queue = clCreateCommandQueueWithProperties(context, gpu_device, properties, NULL);
+        
+#else
+        queue = clCreateCommandQueue(context, gpu_device, CL_QUEUE_PROFILING_ENABLE, NULL);
+#endif
+        
+        string path = gInstPath + "/gemm_f.cl";
+        string source;
+        fileToString(path, source);
+        const char *src = source.c_str();
+        
+        cl_program program = clCreateProgramWithSource(context, 1, &src, NULL, NULL);
+        clBuildProgram(program, 0, NULL, "", NULL, NULL);
+        
+        kernel_f = clCreateKernel(program, "gemm_f_naive", NULL);
+        clReleaseProgram(program);
+        
+        cl_int err = CL_SUCCESS;
+        for (int k = 0; k < 25; k++) {
+            err = opencl_calc_gemm(context, kernel_f, kernel_d, true, queue,
+                                   a, (int)nrowA, (int)ncolA, false,
+                                   b, (int)nrowB, (int)ncolB, false,
+                                   1.0, 0.0, c, work_item_sizes, 1, 1, 1, 1, verbose);
+        }
+        
+        cout << clErrorToString(err) << endl << endl;
+    }
+    
+    cout << "result:" << endl;
+    printMatrix_f(c, 5, 2);
+}
+
+#if 0
 
 #if 0
 std::string crossprod_cl_ckq_d(cl_context context, cl_kernel kernel, cl_command_queue queue,
@@ -165,7 +260,7 @@ int main(int argc, const char * argv[]) {
         cout << result << endl;
     }
     */
-    
+
     return 0;
 }
 
@@ -737,3 +832,5 @@ cl_int xopencl_calc_x(cl_context context, cl_kernel kernel_f, cl_kernel kernel_d
     return err;
 }
 #endif
+#endif
+
