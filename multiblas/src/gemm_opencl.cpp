@@ -75,18 +75,18 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     int nrowC = transposeA ? ncolA : nrowA;
     int ncolC = transposeB ? nrowB : ncolB;
     
-    if (is_float) {
-        for (size_t k = 0; k < nrowC * ncolC; k++) {
-            output_matrix_f[k] = k + 0.1;
-        }
-        
-    } else {
-        for (size_t k = 0; k < nrowC * ncolC; k++) {
-            output_matrix_d[k] = k + 0.1;
-        }
-    }
-    
-    return CL_SUCCESS;
+//    if (is_float) {
+//        for (size_t k = 0; k < nrowC * ncolC; k++) {
+//            output_matrix_f[k] = k + 0.1;
+//        }
+//        
+//    } else {
+//        for (size_t k = 0; k < nrowC * ncolC; k++) {
+//            output_matrix_d[k] = k + 0.1;
+//        }
+//    }
+//    
+//    return CL_SUCCESS;
     
     cl_kernel kernel = is_float ? kernel_f : kernel_d;
     

@@ -73,7 +73,8 @@ multiblas.options <- function(types = NA, processors = NA)
                 "CL_DEVICE_TYPE_ACCELERATOR" = "APU")
                 
                 if (is.na(processors) || processor %in% processors) {
-                    option <- list(type="clBLAS", platform=platform, device=device, processor=processor, label=device$name, path=NA)
+                    label <- paste("clBLAS", device$name)
+                    option <- list(type="clBLAS", platform=platform, device=device, processor=processor, label=label, path=NA)
                     class(option) <- "multiblas.option"
                     
                     options <- append.option(options, option)
@@ -94,7 +95,8 @@ multiblas.options <- function(types = NA, processors = NA)
                 "CL_DEVICE_TYPE_ACCELERATOR" = "APU")
                 
                 if (is.na(processors) || processor %in% processors) {
-                    option <- list(type="OpenCL", platform=platform, device=device, processor=processor, label=device$name, path=NA)
+                    label <- paste("OpenCL", device$name)
+                    option <- list(type="OpenCL", platform=platform, device=device, processor=processor, label=label, path=NA)
                     class(option) <- "multiblas.option"
                     
                     options <- append.option(options, option)

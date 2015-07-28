@@ -19,7 +19,7 @@
 
 // ========== Globals ==============================================================================
 
-bool gTrace = true;    // for debugging
+bool gTrace = false;    // for debugging
 
 #if RPACKAGE
 

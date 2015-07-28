@@ -242,9 +242,11 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
         
         crossprod.info$kernel.f <- get.kernel.source.f(crossprod.info)
         crossprod.info$kernel.d <- get.kernel.source.d(crossprod.info)
+        blas$crossprod.info <- crossprod.info
         
         gemm.info$kernel.f <- get.kernel.source.f(gemm.info)
         gemm.info$kernel.d <- get.kernel.source.d(gemm.info)
+        blas$gemm.info <- gemm.info
         
         blas$crossprod <- function(x) {
             cat("crossprod(x)\n")
@@ -296,8 +298,6 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
         blas$crossprod <- NA
         blas$gemm <- NA
     }
-    
-    blas$fun <- sqrt
     
     return(blas)
 }
