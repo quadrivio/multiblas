@@ -22,7 +22,7 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
                         const void *inMatrixA, int nrowA, int ncolA, bool transposeA,
                         const void *inMatrixB, int nrowB, int ncolB, bool transposeB,
                         double alpha, double beta, void *outMatrix,
-                        const std::vector<size_t>& work_item_sizes, int row_multiple, int col_multiple,
+                        const std::vector<size_t>& work_item_sizes, int vector_size,
                         int row_tile_size, int col_tile_size, bool verbose);
 
 #endif /* defined(__multiBLAS_XC__gemm_opencl__) */

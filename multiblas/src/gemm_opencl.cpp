@@ -42,8 +42,8 @@ extern bool gTrace;    // for debugging
 // ========== Local Functions ============================================================================
 
 cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
-                           int nrow, int ncol, int row_multiple, int col_multiple,
-                           int row_tile_size, int col_tile_size, const std::vector<size_t>& work_item_sizes,
+                           int nrow, int ncol, /*int row_multiple, int col_multiple,
+                           int row_tile_size, int col_tile_size, const std::vector<size_t>& work_item_sizes,*/
                            const void *inMatrix, bool is_float,
                            size_t& full_nrow, size_t& full_ncol, cl_mem& cl_input_matrix,
                            cl_event& fill_in_event1, cl_event& fill_in_event2, cl_event& write_event);
@@ -55,7 +55,7 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
                         const void *inMatrixA, int nrowA, int ncolA, bool transposeA,
                         const void *inMatrixB, int nrowB, int ncolB, bool transposeB,
                         double alpha, double beta, void *outMatrix,
-                        const std::vector<size_t>& work_item_sizes, int row_multiple, int col_multiple,
+                        const std::vector<size_t>& work_item_sizes, int vector_size,
                         int row_tile_size, int col_tile_size, bool verbose)
 {
 #ifdef USE_TIMING
@@ -88,6 +88,15 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     cl_kernel kernel = is_float ? kernel_f : kernel_d;
     
     cl_int err = CL_SUCCESS;
+
+    size_t full_nrowA = 0;
+    size_t full_ncolA = 0;
+    size_t full_ncolB = 0;
+
+    getFullSizes(full_nrowA, full_ncolA, full_ncolB, nrowA, ncolA, ncolB,
+                 vector_size, row_tile_size, col_tile_size, work_item_sizes);
+    
+    size_t full_nrowB = full_ncolA;
     
     // ----- inputA -----
     
@@ -113,8 +122,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         }
     }
     
-    size_t full_nrowA = 0;
-    size_t full_ncolA = 0;
     cl_mem cl_input_matrixA = nullptr;
     cl_event fill_in_event1A = nullptr;
     cl_event fill_in_event2A = nullptr;
@@ -122,8 +129,8 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
 
     if (err == CL_SUCCESS) {
         err = createAndWriteInput(context, queue,
-                                  nrowA, ncolA, row_multiple, col_multiple,
-                                  row_tile_size, col_tile_size, work_item_sizes,
+                                  nrowA, ncolA, /*row_multiple, col_multiple,
+                                  row_tile_size, col_tile_size, work_item_sizes,*/
                                   tmA, is_float,
                                   full_nrowA, full_ncolA, cl_input_matrixA,
                                   fill_in_event1A, fill_in_event2A, write_eventA);
@@ -153,8 +160,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         }
     }
 
-    size_t full_nrowB = 0;
-    size_t full_ncolB = 0;
     cl_mem cl_input_matrixB = nullptr;
     cl_event fill_in_event1B = nullptr;
     cl_event fill_in_event2B = nullptr;
@@ -162,8 +167,8 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     
     if (err == CL_SUCCESS) {
         err = createAndWriteInput(context, queue,
-                                  nrowB, ncolB, row_multiple, col_multiple,
-                                  row_tile_size, col_tile_size, work_item_sizes,
+                                  nrowB, ncolB, /*row_multiple, col_multiple,
+                                  row_tile_size, col_tile_size, work_item_sizes,*/
                                   mB, is_float,
                                   full_nrowB, full_ncolB, cl_input_matrixB,
                                   fill_in_event1B, fill_in_event2B, write_eventB);
@@ -182,12 +187,12 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         }
         
         if (is_float) {
-            cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE,
-                                              full_nrowC * full_ncolC * sizeof(float), NULL, &err);
+            cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                              full_nrowC * full_ncolC * sizeof(float), output_matrix_f, &err);
             
         } else {
-            cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE,
-                                              full_nrowC * full_ncolC * sizeof(double), NULL, &err);
+            cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                              full_nrowC * full_ncolC * sizeof(double), output_matrix_d, &err);
         }
     }
 
@@ -363,8 +368,8 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
-                           int nrow, int ncol, int row_multiple, int col_multiple,
-                           int row_tile_size, int col_tile_size, const std::vector<size_t>& work_item_sizes,
+                           int nrow, int ncol, /*int row_multiple, int col_multiple,
+                           int row_tile_size, int col_tile_size, const std::vector<size_t>& work_item_sizes,*/
                            const void *inMatrix, bool is_float,
                            size_t& full_nrow, size_t& full_ncol, cl_mem& cl_input_matrix,
                            cl_event& fill_in_event1, cl_event& fill_in_event2, cl_event& write_event)
@@ -374,6 +379,7 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
     float *input_matrix_f = (float *)inMatrix;
     double *input_matrix_d = (double *)inMatrix;
 
+    /*
     full_nrow = row_multiple * ((nrow + row_multiple - 1) / row_multiple);
     
     // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
@@ -392,6 +398,7 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
     if (gTrace) {
         CERR << "createAndWriteInput: nrow = " << nrow << ", ncol = " << ncol << ", full_nrow = " << full_nrow << ", full_ncol = " << full_ncol << std::endl;
     }
+    */
     
     // buffers
     cl_input_matrix = NULL;

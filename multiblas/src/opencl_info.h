@@ -10,6 +10,7 @@
 #define __template__opencl_info__
 
 #include <string>
+#include <vector>
 #include <limits.h>
 
 #if defined(__APPLE__)
@@ -31,5 +32,10 @@ const uint32_t UNDEFINED_INFO = UINT_MAX;
 
 cl_platform_info clStringToPlatformInfo(std::string name);
 cl_device_info clStringToDeviceInfo(std::string name);
+
+void getFullSizes(size_t& full_rowsA, size_t& full_colsA, size_t& full_colsB,
+                  size_t rowsA,  size_t colsA,  size_t colsB,
+                  size_t vector_size, size_t row_tile_size, size_t col_tile_size,
+                  const std::vector<size_t>& work_item_sizes);
 
 #endif /* defined(__template__opencl_info__) */

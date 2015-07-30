@@ -65,7 +65,7 @@ extern "C" {
 
     // call from R
     SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_queue, SEXP s_x,
-                         SEXP s_work_item_sizes, SEXP s_row_multiple, SEXP s_col_multiple,
+                         SEXP s_work_item_sizes, SEXP s_vector_size,
                          SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host,
                          SEXP s_verbose);
     
@@ -73,7 +73,7 @@ extern "C" {
     SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_queue,
                             SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C,
                             SEXP s_alpha, SEXP s_beta,
-                            SEXP s_work_item_sizes, SEXP s_row_multiple, SEXP s_col_multiple,
+                            SEXP s_work_item_sizes, SEXP s_vector_size,
                             SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host,
                             SEXP s_verbose);
     

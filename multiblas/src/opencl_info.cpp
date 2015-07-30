@@ -7,6 +7,7 @@
 //
 
 #include "opencl_info.h"
+#include "shim.h"
 
 #include <iostream>
 #include <iomanip>
@@ -14,6 +15,12 @@
 #include <vector>
 
 using namespace std;
+
+// ========== Globals ==============================================================================
+
+extern bool gTrace;    // for debugging
+
+// ========== Functions ============================================================================
 
 string report()
 {
@@ -640,3 +647,23 @@ cl_device_info clStringToDeviceInfo(std::string name)
     return info;
 }
 
+void getFullSizes(size_t& full_rowsA, size_t& full_colsA, size_t& full_colsB,
+                  size_t rowsA,  size_t colsA,  size_t colsB,
+                  size_t vector_size, size_t row_tile_size, size_t col_tile_size,
+                  const std::vector<size_t>& work_item_sizes)
+{
+    full_colsA = vector_size * ((colsA + vector_size - 1) / vector_size);
+    
+    size_t rowsA_multiple = row_tile_size * work_item_sizes[1];
+    full_rowsA = rowsA_multiple * ((rowsA + rowsA_multiple - 1) / rowsA_multiple);
+    
+    size_t colsB_multiple = row_tile_size * work_item_sizes[1];
+    full_colsB = colsB_multiple * ((colsB + colsB_multiple - 1) / colsB_multiple);
+    
+    if (gTrace) {
+        CERR << "getFullSizes(full_rowsA=" << full_rowsA << ", full_colsA=" << full_colsA << ", full_colsB=" << full_colsB << "," << endl <<
+        "    rowsA=" << rowsA << ", colsA=" << colsA << ", colsB=" << colsB<< ", vector_size=" << vector_size << ", " << endl <<
+        "    row_tile_size=" << row_tile_size << ", col_tile_size=" << col_tile_size <<
+        ", work_item_sizes=(" << work_item_sizes[0] << ", " << work_item_sizes[1] << ", " << work_item_sizes[2] << ")" << endl;
+    }
+}

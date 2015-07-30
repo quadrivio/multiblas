@@ -16,8 +16,7 @@ crossprod.defaults <- list(
     kernel.name.d = "crossprod_d_naive",
     kernel.options = "",
     work.item.sizes = c(1, 1, 1),
-    row.multiple = 1,
-    col.multiple = 1,
+    vector.size = 1,
     row.tile.size = 1,
     col.tile.size = 1
 )
@@ -29,8 +28,7 @@ gemm.defaults <- list(
     kernel.name.d = "gemm_d_naive",
     kernel.options = "",
     work.item.sizes = c(1, 1, 1),
-    row.multiple = 1,
-    col.multiple = 1,
+    vector.size = 1,
     row.tile.size = 1,
     col.tile.size = 1
 )
@@ -264,7 +262,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
             }
             
             .Call(opencl_calc_x_C, blas$context, crossprod.info$kernel.f, crossprod.info$kernel.d,
-            blas$queue, x, as.integer(crossprod.info$work.item.sizes), as.integer(crossprod.info$row.multiple), as.integer(crossprod.info$col.multiple),
+            blas$queue, x, as.integer(crossprod.info$work.item.sizes), as.integer(crossprod.info$vector.size),
             as.integer(crossprod.info$row.tile.size), as.integer(crossprod.info$col.tile.size), fill.on.host, verbose)
         }
         
@@ -290,7 +288,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
             
             .Call(opencl_calc_gemm_C, blas$context, gemm.info$kernel.f, gemm.info$kernel.d,
             blas$queue, A, transposeA, B, transposeB, C,
-            alpha, beta, as.integer(gemm.info$work.item.sizes), as.integer(gemm.info$row.multiple), as.integer(gemm.info$col.multiple),
+            alpha, beta, as.integer(gemm.info$work.item.sizes), as.integer(gemm.info$vector.size),
             as.integer(gemm.info$row.tile.size), as.integer(gemm.info$col.tile.size), fill.on.host, verbose)
         }
         
