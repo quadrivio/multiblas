@@ -72,9 +72,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         CERR << "opencl_calc_gemm( " << (is_float ? "FLOAT" : "DOUBLE") << ")" << std::endl << std::endl;
     }
     
-    int nrowC = transposeA ? ncolA : nrowA;
-    int ncolC = transposeB ? nrowB : ncolB;
-    
 //    if (is_float) {
 //        for (size_t k = 0; k < nrowC * ncolC; k++) {
 //            output_matrix_f[k] = k + 0.1;
@@ -172,6 +169,9 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
                                   fill_in_event1B, fill_in_event2B, write_eventB);
     }
 
+    int nrowC = transposeA ? ncolA : nrowA;
+    int ncolC = transposeB ? nrowB : ncolB;
+    
     size_t full_nrowC = transposeA ? full_ncolA : full_nrowA;
     size_t full_ncolC = transposeB ? full_nrowB : full_ncolB;
 

@@ -19,7 +19,7 @@
 
 // ========== Globals ==============================================================================
 
-bool gTrace = false;    // for debugging
+bool gTrace = true;    // for debugging
 
 #if RPACKAGE
 
@@ -2246,6 +2246,17 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                     for (size_t row = 0; row < nrowA; row++) {
                         for (size_t col = 0; col < ncolA; col++) {
                             CERR << inMatrixA[row + col * nrowA] << "\t";
+                        }
+                        CERR << endl;
+                    }
+                    CERR << endl;
+                }
+                
+                if (gTrace && nrowB * ncolB <= 256) {
+                    CERR << "inMatrixB:" << endl;
+                    for (size_t row = 0; row < nrowB; row++) {
+                        for (size_t col = 0; col < ncolB; col++) {
+                            CERR << inMatrixB[row + col * nrowB] << "\t";
                         }
                         CERR << endl;
                     }
