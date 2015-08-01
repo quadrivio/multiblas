@@ -1,3 +1,51 @@
+#ifndef VECTOR_SIZE
+#define VECTOR_SIZE 1
+#endif
+
+#if VECTOR_SIZE == 1
+#define floatN float
+#elif VECTOR_SIZE == 2
+#define floatN float2
+#elif VECTOR_SIZE == 4
+#define floatN float4
+#elif VECTOR_SIZE == 8
+#define floatN float8
+#endif
+
+
+__kernel void gemm_f_naiveN(__private int inputA_nrow,
+                           __private int inputA_ncol,
+                           __private int inputB_nrow,
+                           __private int inputB_ncol,
+                           __private float alpha,
+                           __private float beta,
+                           __global floatN* inputAT,
+                           __global floatN* inputB,
+                           __global float* output) {
+    int output_col = get_global_id(0);
+    int output_row = get_global_id(1);
+    
+    float sum = 0.0f;
+    int index1 = inputA_ncol * output_row / VECTOR_SIZE;
+    int index2 = inputB_nrow * output_col / VECTOR_SIZE;
+    for (int k = 0; k < inputB_nrow / VECTOR_SIZE; k++) {
+#if VECTOR_SIZE == 1
+        sum += inputAT[index1 + k] * inputB[index2 + k];
+        
+#elif (VECTOR_SIZE == 2) || (VECTOR_SIZE == 4)
+        sum += dot(inputAT[index1 + k], inputB[index2 + k]);
+        
+#elif VECTOR_SIZE == 8
+        sum += dot(inputAT[index1 + k].hi, inputB[index2 + k].hi) +
+            dot(inputAT[index1 + k].lo, inputB[index2 + k].lo);
+#endif
+
+    }
+    
+    output[output_col * inputA_nrow + output_row] *= beta;
+    output[output_col * inputA_nrow + output_row] += alpha * sum;
+}
+
 __kernel void gemm_f_naive(__private int inputA_nrow,
                            __private int inputA_ncol,
                            __private int inputB_nrow,

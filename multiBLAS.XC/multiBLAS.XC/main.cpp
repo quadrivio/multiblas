@@ -106,7 +106,7 @@ int main(int argc, const char * argv[]) {
             err = opencl_calc_gemm(context, kernel_f, kernel_d, true, queue,
                                    a, (int)nrowA, (int)ncolA, false,
                                    b, (int)nrowB, (int)ncolB, false,
-                                   1.0, 0.0, c, work_item_sizes, 1, 1, 1, verbose);
+                                   1.0, 0.0, c, work_item_sizes, 1, 1, 1, 1, verbose);
         }
         
         cout << clErrorToString(err) << endl << endl;

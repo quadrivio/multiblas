@@ -649,10 +649,11 @@ cl_device_info clStringToDeviceInfo(std::string name)
 
 void getFullSizes(size_t& full_rowsA, size_t& full_colsA, size_t& full_colsB,
                   size_t rowsA,  size_t colsA,  size_t colsB,
-                  size_t vector_size, size_t row_tile_size, size_t col_tile_size,
+                  size_t vector_size, size_t row_multiple, size_t row_tile_size, size_t col_tile_size,
                   const std::vector<size_t>& work_item_sizes)
 {
-    full_colsA = vector_size * ((colsA + vector_size - 1) / vector_size);
+    size_t multiple = vector_size * row_multiple;
+    full_colsA = multiple * ((colsA + multiple - 1) / multiple);
     
     size_t rowsA_multiple = row_tile_size * work_item_sizes[1];
     full_rowsA = rowsA_multiple * ((rowsA + rowsA_multiple - 1) / rowsA_multiple);
@@ -662,7 +663,8 @@ void getFullSizes(size_t& full_rowsA, size_t& full_colsA, size_t& full_colsB,
     
     if (gTrace) {
         CERR << "getFullSizes(full_rowsA=" << full_rowsA << ", full_colsA=" << full_colsA << ", full_colsB=" << full_colsB << "," << endl <<
-        "    rowsA=" << rowsA << ", colsA=" << colsA << ", colsB=" << colsB<< ", vector_size=" << vector_size << ", " << endl <<
+        "    rowsA=" << rowsA << ", colsA=" << colsA << ", colsB=" << colsB << ", vector_size=" << vector_size<<
+        ", row_multiple=" << row_multiple << ", " << endl <<
         "    row_tile_size=" << row_tile_size << ", col_tile_size=" << col_tile_size <<
         ", work_item_sizes=(" << work_item_sizes[0] << ", " << work_item_sizes[1] << ", " << work_item_sizes[2] << ")" << endl;
     }

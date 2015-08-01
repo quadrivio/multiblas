@@ -17,6 +17,7 @@ crossprod.defaults <- list(
     kernel.options = "",
     work.item.sizes = c(1, 1, 1),
     vector.size = 1,
+    row.multiple = 1,
     row.tile.size = 1,
     col.tile.size = 1
 )
@@ -29,6 +30,7 @@ gemm.defaults <- list(
     kernel.options = "",
     work.item.sizes = c(1, 1, 1),
     vector.size = 1,
+    row.multiple = 1,
     row.tile.size = 1,
     col.tile.size = 1
 )
@@ -215,10 +217,14 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
                 kernel.f <- NULL
                 
             } else {
+                options <- paste("-DVECTOR_SIZE=", info$vector.size,
+                    " -DROW_TILE_SIZE=", info$row.tile.size,
+                    " -DCOL_TILE_SIZE=", info$col.tile.size,
+                    " ", info$kernel.options, sep="")
                 source.f <- paste(readLines(info$kernel.path.f), collapse="\n")
                 kernel.f <- tryCatch(.Call(opencl_kernel_C, blas$context, blas$device,
-                info$kernel.name.f, source.f, info$kernel.options, verbose),
-                error = function(e) {cat(info$kernel.path.f, e$message, "\n"); NULL})
+                    info$kernel.name.f, source.f, options, verbose),
+                    error = function(e) {cat(info$kernel.path.f, e$message, "\n"); NULL})
             }
             
             return(kernel.f)
@@ -229,10 +235,14 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
                 kernel.d <- NULL
                 
             } else {
+                options <- paste("-DVECTOR_SIZE=", info$vector.size,
+                    " -DROW_TILE_SIZE=", info$row.tile.size,
+                    " -DCOL_TILE_SIZE=", info$col.tile.size,
+                    " ", info$kernel.options, sep="")
                 source.d <- paste(readLines(info$kernel.path.d), collapse="\n")
                 kernel.d <- tryCatch(.Call(opencl_kernel_C, blas$context, blas$device,
-                info$kernel.name.d, source.d, info$kernel.options, verbose),
-                error = function(e) {cat(info$kernel.path.d, e$message, "\n"); NULL})
+                    info$kernel.name.d, source.d, options, verbose),
+                    error = function(e) {cat(info$kernel.path.d, e$message, "\n"); NULL})
             }
             
             return(kernel.d)
@@ -263,6 +273,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
             
             .Call(opencl_calc_x_C, blas$context, crossprod.info$kernel.f, crossprod.info$kernel.d,
             blas$queue, x, as.integer(crossprod.info$work.item.sizes), as.integer(crossprod.info$vector.size),
+            as.integer(crossprod.info$row.multiple),
             as.integer(crossprod.info$row.tile.size), as.integer(crossprod.info$col.tile.size), fill.on.host, verbose)
         }
         
@@ -289,6 +300,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
             .Call(opencl_calc_gemm_C, blas$context, gemm.info$kernel.f, gemm.info$kernel.d,
             blas$queue, A, transposeA, B, transposeB, C,
             alpha, beta, as.integer(gemm.info$work.item.sizes), as.integer(gemm.info$vector.size),
+            as.integer(gemm.info$row.multiple),
             as.integer(gemm.info$row.tile.size), as.integer(gemm.info$col.tile.size), fill.on.host, verbose)
         }
         

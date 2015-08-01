@@ -1050,7 +1050,7 @@ SEXP opencl_kernel_C(SEXP s_context, SEXP s_device, SEXP s_name, SEXP s_source, 
 }
 
 SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_queue, SEXP s_x,
-                     SEXP s_work_item_sizes, SEXP s_vector_size,
+                     SEXP s_work_item_sizes, SEXP s_vector_size, SEXP s_row_multiple,
                      SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host, SEXP s_verbose)
 {
     
@@ -1158,6 +1158,10 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
         error("opencl_calc_x_C: wrong vector_size class");
     }
     
+    if (!Rf_isInteger(s_row_multiple)) {
+        error("opencl_calc_x_C: wrong row_multiple class");
+    }
+    
 //    if (!Rf_isInteger(s_col_multiple)) {
 //        error("opencl_calc_x_C: wrong col_multiple class");
 //    }
@@ -1211,7 +1215,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
     work_item_sizes.push_back(XLENGTH(s_work_item_sizes) > 2 ? p[2] : 1);
     
     int vector_size = *INTEGER(s_vector_size);
-//    int col_multiple = *INTEGER(s_col_multiple);
+    int row_multiple = *INTEGER(s_row_multiple);
     
     int row_tile_size = *INTEGER(s_row_tile_size);
     int col_tile_size = *INTEGER(s_col_tile_size);
@@ -1247,7 +1251,8 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
     
     cl_int err = CL_SUCCESS;
     
-    size_t filled_nrow = vector_size * ((nrow + vector_size - 1) / vector_size);
+    size_t multiple = vector_size * row_multiple;
+    size_t filled_nrow = multiple * ((nrow + multiple - 1) / multiple);
     
     // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
     size_t gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
@@ -1327,7 +1332,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
                 
                 err = opencl_calc_x(context, kernel_f, kernel_d, true, queue, inMatrix, outMatrix,
                                     (int)filled_nrow, (int)filled_ncol, work_item_sizes,
-                                    vector_size, row_tile_size, col_tile_size, verbose);
+                                    vector_size, row_multiple, row_tile_size, col_tile_size, verbose);
 
                 if (gTrace && ncol <= 16) {
                     CERR << "outMatrix:" << endl;
@@ -1401,7 +1406,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
                 
                 err = opencl_calc_x(context, kernel_f, kernel_d, false, queue, inMatrix, outMatrix,
                                     (int)filled_nrow, (int)filled_ncol, work_item_sizes,
-                                    vector_size, row_tile_size, col_tile_size, verbose);
+                                    vector_size, row_multiple, row_tile_size, col_tile_size, verbose);
                 
                 if (gTrace && ncol <= 16) {
                     CERR << "outMatrix:" << endl;
@@ -1467,7 +1472,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
                 }
                 
                 err = opencl_calc_x(context, kernel_f, kernel_d, true, queue, inMatrix, outMatrix,
-                                    dims[0], dims[1], work_item_sizes, vector_size,
+                                    dims[0], dims[1], work_item_sizes, vector_size, row_multiple,
                                     row_tile_size, col_tile_size, verbose);
                 
                 if (gTrace && ncol <= 16) {
@@ -1504,7 +1509,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
             }
             
             err = opencl_calc_x(context, kernel_f, kernel_d, false, queue, x, REAL(result), dims[0], dims[1],
-                                work_item_sizes, vector_size, row_tile_size, col_tile_size, verbose);
+                                work_item_sizes, vector_size, row_multiple, row_tile_size, col_tile_size, verbose);
         }
     }
     
@@ -1548,7 +1553,7 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
 SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_queue,
                         SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C,
                         SEXP s_alpha, SEXP s_beta,
-                        SEXP s_work_item_sizes, SEXP s_vector_size,
+                        SEXP s_work_item_sizes, SEXP s_vector_size, SEXP s_row_multiple,
                         SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host,
                         SEXP s_verbose)
 {
@@ -1779,9 +1784,9 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
         error("opencl_calc_gemm_C: wrong vector_size class");
     }
     
-//    if (!Rf_isInteger(s_col_multiple)) {
-//        error("opencl_calc_gemm_C: wrong col_multiple class");
-//    }
+    if (!Rf_isInteger(s_row_multiple)) {
+        error("opencl_calc_gemm_C: wrong row_multiple class");
+    }
     
     if (!Rf_isInteger(s_row_tile_size)) {
         error("opencl_calc_gemm_C: wrong row_tile.size class");
@@ -1842,7 +1847,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     work_item_sizes.push_back(XLENGTH(s_work_item_sizes) > 2 ? p[2] : 1);
     
     int vector_size = *INTEGER(s_vector_size);
-//    int col_multiple = *INTEGER(s_col_multiple);
+    int row_multiple = *INTEGER(s_row_multiple);
     
     int row_tile_size = *INTEGER(s_row_tile_size);
     int col_tile_size = *INTEGER(s_col_tile_size);
@@ -1891,7 +1896,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     size_t full_ncolB = 0;
     
     getFullSizes(full_nrowA, full_ncolA, full_ncolB, nrowA, ncolA, ncolB,
-                 vector_size, row_tile_size, col_tile_size, work_item_sizes);
+                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
     
     size_t full_nrowB = full_ncolA;
     
@@ -2063,7 +2068,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                                        inMatrixA, (int)full_nrowA, (int)full_ncolA, transposeA,
                                        inMatrixB, (int)full_nrowB, (int)full_ncolB, transposeB,
                                        alpha, beta, outMatrix,
-                                       work_item_sizes, vector_size,
+                                       work_item_sizes, vector_size, row_multiple,
                                        row_tile_size, col_tile_size, verbose);
                 
                 if (gTrace && outCol <= 16) {
@@ -2196,7 +2201,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                                        inMatrixA, (int)full_nrowA, (int)full_ncolA, transposeA,
                                        inMatrixB, (int)full_nrowB, (int)full_ncolB, transposeB,
                                        alpha, beta, outMatrix,
-                                       work_item_sizes, vector_size,
+                                       work_item_sizes, vector_size, row_multiple,
                                        row_tile_size, col_tile_size, verbose);
                 
                 if (gTrace && outCol <= 16) {
@@ -2302,7 +2307,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                                        inMatrixA, (int)nrowA, (int)ncolA, transposeA,
                                        inMatrixB, (int)nrowB, (int)ncolB, transposeB,
                                        alpha, beta, outMatrix,
-                                       work_item_sizes, vector_size,
+                                       work_item_sizes, vector_size, row_multiple,
                                        row_tile_size, col_tile_size, verbose);
                 
                 if (gTrace && outCol <= 16) {
@@ -2360,7 +2365,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                                    A, (int)nrowA, (int)ncolA, transposeA,
                                    B, (int)nrowB, (int)ncolB, transposeB,
                                    alpha, beta, REAL(result),
-                                   work_item_sizes, vector_size,
+                                   work_item_sizes, vector_size, row_multiple,
                                    row_tile_size, col_tile_size, verbose);
         }
     }

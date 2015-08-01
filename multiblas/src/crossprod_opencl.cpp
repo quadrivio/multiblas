@@ -41,7 +41,7 @@ extern bool gTrace;    // for debugging
 
 cl_int opencl_calc_x(cl_context context, cl_kernel kernel_f, cl_kernel kernel_d, bool is_float,
                      cl_command_queue queue, void *inMatrix, void *outMatrix, size_t nrow, size_t ncol,
-                     const std::vector<size_t>& work_item_sizes, int vector_size,
+                     const std::vector<size_t>& work_item_sizes, int vector_size, int row_multiple,
                      int row_tile_size, int col_tile_size, bool verbose)
 {
 #ifdef USE_TIMING
@@ -67,7 +67,8 @@ cl_int opencl_calc_x(cl_context context, cl_kernel kernel_f, cl_kernel kernel_d,
     
     cl_int err = CL_SUCCESS;
 
-    size_t full_nrow = vector_size * ((nrow + vector_size - 1) / vector_size);
+    size_t multiple = vector_size * row_multiple;
+    size_t full_nrow = multiple * ((nrow + multiple - 1) / multiple);
 
     // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
     size_t gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;

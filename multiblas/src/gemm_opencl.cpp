@@ -55,7 +55,7 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
                         const void *inMatrixA, int nrowA, int ncolA, bool transposeA,
                         const void *inMatrixB, int nrowB, int ncolB, bool transposeB,
                         double alpha, double beta, void *outMatrix,
-                        const std::vector<size_t>& work_item_sizes, int vector_size,
+                        const std::vector<size_t>& work_item_sizes, int vector_size, int row_multiple,
                         int row_tile_size, int col_tile_size, bool verbose)
 {
 #ifdef USE_TIMING
@@ -94,7 +94,7 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     size_t full_ncolB = 0;
 
     getFullSizes(full_nrowA, full_ncolA, full_ncolB, nrowA, ncolA, ncolB,
-                 vector_size, row_tile_size, col_tile_size, work_item_sizes);
+                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
     
     size_t full_nrowB = full_ncolA;
     
