@@ -248,6 +248,10 @@ SEXP crossprod_blas_C(SEXP s_x)
     }
     
     if (isFloat) {
+#if 1
+        error("crossprod_blas_C: single-precision not available");
+        
+#else
         size_t len = XLENGTH(s_x);
         
         float *inMatrix = (float *)calloc(len, sizeof(float));
@@ -281,6 +285,7 @@ SEXP crossprod_blas_C(SEXP s_x)
             free(outMatrix);
             outMatrix = nullptr;
         }
+#endif
         
     } else {
         crossprod_blas_d(x, REAL(result), dims[0], dims[1]);

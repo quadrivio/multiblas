@@ -10,6 +10,7 @@
 #include "shim.h"
 
 #include <cstdlib>
+#include <cstring>
 #include <string>
 
 void gemm_naive_d(const double *inMatrixA, int nrowA, int ncolA, bool transposeA,
@@ -112,9 +113,9 @@ void transpose_f(float *x, int nrow, int ncol)
 void transpose_f(const float *from, int nrow, int ncol, float *to)
 {
     const float *q = from;
-    for (size_t col = 0; col < ncol; col++) {
+    for (int col = 0; col < ncol; col++) {
         float *p = to + col;
-        for (size_t row = 0; row < nrow; row++) {
+        for (int row = 0; row < nrow; row++) {
             *p = *q++;
             p += ncol;
         }
@@ -124,9 +125,9 @@ void transpose_f(const float *from, int nrow, int ncol, float *to)
 void transpose_d(const double *from, int nrow, int ncol, double *to)
 {
     const double *q = from;
-    for (size_t col = 0; col < ncol; col++) {
+    for (int col = 0; col < ncol; col++) {
         double *p = to + col;
-        for (size_t row = 0; row < nrow; row++) {
+        for (int row = 0; row < nrow; row++) {
             *p = *q++;
             p += ncol;
         }

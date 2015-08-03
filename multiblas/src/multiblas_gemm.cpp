@@ -254,20 +254,20 @@ SEXP gemm_naive_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP
         } else {
             float *p = inMatrixA;
             double *q = A;
-            for (size_t k = 0; k < XLENGTH(s_A); k++) {
+            for (int k = 0; k < XLENGTH(s_A); k++) {
                 *p++ = (float)*q++;
             }
             
             p = inMatrixB;
             q = B;
-            for (size_t k = 0; k < XLENGTH(s_B); k++) {
+            for (int k = 0; k < XLENGTH(s_B); k++) {
                 *p++ = (float)*q++;
             }
             
-            if (!cIsNA && XLENGTH(s_C) == outRow * outCol) {
+            if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
                 p = outMatrix;
                 q = C;
-                for (size_t k = 0; k < XLENGTH(s_C); k++) {
+                for (int k = 0; k < XLENGTH(s_C); k++) {
                     *p++ = (float)*q++;
                 }
                 
@@ -300,7 +300,7 @@ SEXP gemm_naive_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP
         }
         
     } else {
-        if (!cIsNA && XLENGTH(s_C) == outRow * outCol) {
+        if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
             memcpy(REAL(result), C, outRow * outCol * sizeof(double));
             
         } else {
@@ -526,6 +526,10 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
     }
     
     if (isFloatA || isFloatB || isFloatC) {
+#if 1
+        error("gemm_blas_C: single-precision not available");
+        
+#else
         float *inMatrixA = (float *)calloc(XLENGTH(s_A), sizeof(float));
         float *inMatrixB = (float *)calloc(XLENGTH(s_B), sizeof(float));
         float *outMatrix = (float *)calloc(outRow * outCol, sizeof(float));
@@ -536,20 +540,20 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
         } else {
             float *p = inMatrixA;
             const double *q = A;
-            for (size_t k = 0; k < XLENGTH(s_A); k++) {
+            for (int k = 0; k < XLENGTH(s_A); k++) {
                 *p++ = (float)*q++;
             }
             
             p = inMatrixB;
             q = B;
-            for (size_t k = 0; k < XLENGTH(s_B); k++) {
+            for (int k = 0; k < XLENGTH(s_B); k++) {
                 *p++ = (float)*q++;
             }
             
-            if (!cIsNA && XLENGTH(s_C) == outRow * outCol) {
+            if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
                 p = outMatrix;
                 q = C;
-                for (size_t k = 0; k < XLENGTH(s_C); k++) {
+                for (int k = 0; k < XLENGTH(s_C); k++) {
                     *p++ = (float)*q++;
                 }
                 
@@ -580,9 +584,10 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
             free(outMatrix);
             outMatrix = nullptr;
         }
+#endif
         
     } else {
-        if (!cIsNA && XLENGTH(s_C) == outRow * outCol) {
+        if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
             memcpy(REAL(result), C, outRow * outCol * sizeof(double));
             
         } else {
@@ -842,20 +847,20 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
         } else {
             float *p = inMatrixA;
             double *q = A;
-            for (size_t k = 0; k < XLENGTH(s_A); k++) {
+            for (int k = 0; k < XLENGTH(s_A); k++) {
                 *p++ = (float)*q++;
             }
             
             p = inMatrixB;
             q = B;
-            for (size_t k = 0; k < XLENGTH(s_B); k++) {
+            for (int k = 0; k < XLENGTH(s_B); k++) {
                 *p++ = (float)*q++;
             }
             
-            if (!cIsNA && XLENGTH(s_C) == outRow * outCol) {
+            if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
                 p = outMatrix;
                 q = C;
-                for (size_t k = 0; k < XLENGTH(s_C); k++) {
+                for (int k = 0; k < XLENGTH(s_C); k++) {
                     *p++ = (float)*q++;
                 }
                 
@@ -888,7 +893,7 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
         }
         
     } else {
-        if (!cIsNA && XLENGTH(s_C) == outRow * outCol) {
+        if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
             memcpy(REAL(result), C, outRow * outCol * sizeof(double));
             
         } else {

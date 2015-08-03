@@ -269,7 +269,7 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     
     // retrieve result
     if (err == CL_SUCCESS) {
-        if (ncolC == full_ncolC && nrowC == full_nrowC) {
+        if ((size_t)ncolC == full_ncolC && (size_t)nrowC == full_nrowC) {
             if (gTrace) {
                 CERR << "Retrieve result (clEnqueueReadBuffer):" << std::endl;
             }
@@ -407,7 +407,7 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
             CERR << "clCreateBuffer cl_input_matrix:" << std::endl;
         }
         
-        if (ncol == full_ncol && nrow == full_nrow) {
+        if ((size_t)ncol == full_ncol && (size_t)nrow == full_nrow) {
             if (is_float) {
                 cl_input_matrix = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                                                  nrow * ncol * sizeof(float), input_matrix_f, &err);
@@ -436,8 +436,8 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
     fill_in_event1 = nullptr;
     fill_in_event2 = nullptr;
     if (err == CL_SUCCESS) {
-        if (ncol != full_ncol || nrow != full_nrow) {
-            if (full_nrow > nrow) {
+        if ((size_t)ncol != full_ncol || (size_t)nrow != full_nrow) {
+            if (full_nrow > (size_t)nrow) {
                 if (gTrace) {
                     CERR << "clEnqueueWriteBufferRect zeros1" << std::endl;
                 }
@@ -480,7 +480,7 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
                 }
             }
             
-            if (full_ncol > ncol && err == CL_SUCCESS) {
+            if (full_ncol > (size_t)ncol && err == CL_SUCCESS) {
                 if (gTrace) {
                     CERR << "clEnqueueWriteBufferRect zeros2" << std::endl;
                 }
@@ -525,7 +525,7 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
     
     write_event = nullptr;
     if (err == CL_SUCCESS) {
-        if (ncol != full_ncol || nrow != full_nrow) {
+        if ((size_t)ncol != full_ncol || (size_t)nrow != full_nrow) {
             if (is_float) {
                 err = clEnqueueWriteBufferRect(queue, cl_input_matrix, CL_FALSE, origin, origin,
                                                region_f, full_nrow * sizeof(float), 0, nrow * sizeof(float),
