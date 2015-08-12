@@ -24,7 +24,7 @@ void gemm_naive_d(const double *inMatrixA, int nrowA, int ncolA, bool transposeA
     for (size_t col = 0; col < ncolC; col++) {
         for (size_t row = 0; row < nrowC; row++) {
             const double *ptrA = transposeA ? &inMatrixA[nrowA * row] : &inMatrixA[row];
-            const double *ptrB = transposeB ? &inMatrixB[row] : &inMatrixB[nrowB * col];
+            const double *ptrB = transposeB ? &inMatrixB[col] : &inMatrixB[nrowB * col];
             double sum = 0.0;
             for (size_t k = 0; k < terms; k++) {
                 sum += *ptrA * *ptrB;
@@ -60,7 +60,7 @@ void gemm_naive_f(const float *inMatrixA, int nrowA, int ncolA, bool transposeA,
     for (size_t col = 0; col < ncolC; col++) {
         for (size_t row = 0; row < nrowC; row++) {
             const float *ptrA = transposeA ? &inMatrixA[nrowA * row] : &inMatrixA[row];
-            const float *ptrB = transposeB ? &inMatrixB[row] : &inMatrixB[nrowB * col];
+            const float *ptrB = transposeB ? &inMatrixB[col] : &inMatrixB[nrowB * col];
             float sum = 0.0;
             for (size_t k = 0; k < terms; k++) {
                 sum += *ptrA * *ptrB;

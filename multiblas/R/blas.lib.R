@@ -176,7 +176,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
         blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             if (transposeA) A <- t(A)
             if (transposeB) B <- t(B)
-            if (is.na(C)) C <- 0.0
+            if (is.na(C[1])) C <- 0.0
             
             result <- alpha * A %*% B + beta * C
             
