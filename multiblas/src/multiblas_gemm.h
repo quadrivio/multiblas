@@ -39,6 +39,9 @@ extern "C" {
     SEXP gemm_naive_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta);
     
     // call from R
+    SEXP gemm_r_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta);
+    
+    // call from R
     SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta);
     
     // call from R

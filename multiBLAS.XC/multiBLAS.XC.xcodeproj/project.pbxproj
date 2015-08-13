@@ -32,6 +32,8 @@
 		4CE50DEB1B3E0CFE009549D9 /* utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CF708491B3CD6BE009AB227 /* utils.cpp */; };
 		4CE50DEC1B3E0D07009549D9 /* shim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CF708471B3CD6BE009AB227 /* shim.cpp */; };
 		4CF708191B3CD2E7009AB227 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CF708181B3CD2E7009AB227 /* main.cpp */; };
+		4CFCCF561B7CE64C00402EE6 /* crossprod_r.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CFCCF541B7CE64C00402EE6 /* crossprod_r.cpp */; };
+		4CFCCF591B7CE65700402EE6 /* gemm_r.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CFCCF571B7CE65700402EE6 /* gemm_r.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -108,6 +110,10 @@
 		4CF708481B3CD6BE009AB227 /* shim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shim.h; sourceTree = "<group>"; };
 		4CF708491B3CD6BE009AB227 /* utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = utils.cpp; sourceTree = "<group>"; };
 		4CF7084A1B3CD6BE009AB227 /* utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
+		4CFCCF541B7CE64C00402EE6 /* crossprod_r.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_r.cpp; sourceTree = "<group>"; };
+		4CFCCF551B7CE64C00402EE6 /* crossprod_r.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crossprod_r.h; sourceTree = "<group>"; };
+		4CFCCF571B7CE65700402EE6 /* gemm_r.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gemm_r.cpp; sourceTree = "<group>"; };
+		4CFCCF581B7CE65700402EE6 /* gemm_r.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gemm_r.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +235,8 @@
 			children = (
 				4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */,
 				4C61ABD41B616CDB00F41D23 /* multiblas_gemm.h */,
+				4CFCCF571B7CE65700402EE6 /* gemm_r.cpp */,
+				4CFCCF581B7CE65700402EE6 /* gemm_r.h */,
 				4C61ABD01B61579400F41D23 /* gemm_blas.cpp */,
 				4C61ABD11B61579400F41D23 /* gemm_blas.h */,
 				4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */,
@@ -239,6 +247,8 @@
 				4C61ABDD1B616E9E00F41D23 /* gemm_naive.h */,
 				4CD8BB9A1B45C0B500766B7E /* multiblas_crossprod.cpp */,
 				4CD8BB9B1B45C0B500766B7E /* multiblas_crossprod.h */,
+				4CFCCF541B7CE64C00402EE6 /* crossprod_r.cpp */,
+				4CFCCF551B7CE64C00402EE6 /* crossprod_r.h */,
 				4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */,
 				4CD8BB8C1B45BC1000766B7E /* crossprod_blas.h */,
 				4CD8BB8D1B45BC1000766B7E /* crossprod_clblas.cpp */,
@@ -317,6 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CFCCF561B7CE64C00402EE6 /* crossprod_r.cpp in Sources */,
 				4C61ABDE1B616E9E00F41D23 /* gemm_naive.cpp in Sources */,
 				4CD8BB961B45BC1000766B7E /* crossprod_naive.cpp in Sources */,
 				4C61ABE11B616F2D00F41D23 /* utils_clblas.cpp in Sources */,
@@ -334,6 +345,7 @@
 				4CD8BB931B45BC1000766B7E /* crossprod_blas.cpp in Sources */,
 				4CE50DEB1B3E0CFE009549D9 /* utils.cpp in Sources */,
 				4C8CF12D1B41BE9E00573C31 /* multiblas.cpp in Sources */,
+				4CFCCF591B7CE65700402EE6 /* gemm_r.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

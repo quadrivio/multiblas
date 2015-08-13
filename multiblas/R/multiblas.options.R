@@ -33,10 +33,10 @@ multiblas.options <- function(types = NA, processors = NA)
         }
         
         if (is.na(path)) {
-            label <- "Rblas"
+            label <- "R"
             
         } else {
-            label <- basename(path)
+            label <- paste("R", basename(path))
         }
         
         option <- list(type="R", platform=NA, device=NA, processor=NA, label=label, path=path)
@@ -48,6 +48,14 @@ multiblas.options <- function(types = NA, processors = NA)
     if (is.na(types) || "Naive" %in% types || "naive" %in% types) {
         label <- "Naive"
         option <- list(type="Naive", platform=NA, device=NA, processor=NA, label=label, path=NA)
+        class(option) <- "multiblas.option"
+        
+        options <- append.option(options, option)
+    }
+    
+    if (is.na(types) || "C" %in% types || "c" %in% types) {
+        label <- "C"
+        option <- list(type="C", platform=NA, device=NA, processor=NA, label=label, path=NA)
         class(option) <- "multiblas.option"
         
         options <- append.option(options, option)

@@ -9,6 +9,7 @@
 #include "multiblas_gemm.h"
 #include "opencl_info.h"
 #include "gemm_naive.h"
+#include "gemm_r.h"
 #include "gemm_blas.h"
 #include "gemm_clblas.h"
 
@@ -526,10 +527,10 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
     }
     
     if (isFloatA || isFloatB || isFloatC) {
-#if 1
-        error("gemm_blas_C: single-precision not available");
+        if (!cblas_sgemm_available()) {
+            error("gemm_blas_C: single-precision not available");
+        }
         
-#else
         float *inMatrixA = (float *)calloc(XLENGTH(s_A), sizeof(float));
         float *inMatrixB = (float *)calloc(XLENGTH(s_B), sizeof(float));
         float *outMatrix = (float *)calloc(outRow * outCol, sizeof(float));
@@ -584,9 +585,12 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
             free(outMatrix);
             outMatrix = nullptr;
         }
-#endif
         
     } else {
+        if (!cblas_dgemm_available()) {
+            error("gemm_blas_C: double-precision not available");
+        }
+        
         if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
             memcpy(REAL(result), C, outRow * outCol * sizeof(double));
             
@@ -606,9 +610,9 @@ SEXP gemm_blas_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP 
     return(result);
 }
 
-SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta)
+SEXP gemm_r_C(SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta)
 {
-    if (gTrace) CERR << "gemm_naive_C" << endl;
+    if (gTrace) CERR << "gemm_r_C" << endl;
     
     int resultUnprotectCount = 0;
     
@@ -616,27 +620,16 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     
     if (gTrace) CERR << "verify arg type" << endl;
     
-    {
-        SEXP deviceClass;
-        PROTECT(deviceClass = Rf_getAttrib(s_device, R_ClassSymbol));
-        
-        if (!Rf_isNull(deviceClass) && strcmp("opencl.device", CHAR(STRING_ELT(deviceClass, 0))) != 0) {
-            error("gemm_clblas_C: wrong device class");
-        }
-        
-        UNPROTECT(1);
-    }
-    
     // s_A
     
     if (Rf_isComplex(s_A)) {
-        error("gemm_naive_C: complex A not implemented yet");
+        error("gemm_r_C: complex A not implemented yet");
         
     } else if (Rf_isInteger(s_A)) {
-        error("gemm_naive_C: integer A not implemented yet");
+        error("gemm_r_C: integer A not implemented yet");
         
     } else if (!Rf_isReal(s_A) && !Rf_isInteger(s_A)) {
-        error("gemm_naive_C: wrong A type");
+        error("gemm_r_C: wrong A type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_A) = " << XLENGTH(s_A) << endl;
@@ -646,7 +639,7 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims_A)) {
-        error("gemm_naive_C: no A dimensions");
+        error("gemm_r_C: no A dimensions");
     }
     
     SEXP s_float_A;
@@ -667,19 +660,19 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     }
     
     if (dimCountA != 2) {
-        error("gemm_naive_C: wrong A dimension");
+        error("gemm_r_C: wrong A dimension");
     }
     
     // s_B
     
     if (Rf_isComplex(s_B)) {
-        error("gemm_naive_C: complex B not implemented yet");
+        error("gemm_r_C: complex B not implemented yet");
         
     } else if (Rf_isInteger(s_B)) {
-        error("gemm_naive_C: integer B not implemented yet");
+        error("gemm_r_C: integer B not implemented yet");
         
     } else if (!Rf_isReal(s_B) && !Rf_isInteger(s_B)) {
-        error("gemm_naive_C: wrong B type");
+        error("gemm_r_C: wrong B type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_B) = " << XLENGTH(s_B) << endl;
@@ -689,7 +682,7 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     resultUnprotectCount++;
     
     if (Rf_isNull(s_dims_B)) {
-        error("gemm_naive_C: no B dimensions");
+        error("gemm_r_C: no B dimensions");
     }
     
     SEXP s_float_B;
@@ -710,7 +703,7 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     }
     
     if (dimCountB != 2) {
-        error("gemm_naive_C: wrong B dimension");
+        error("gemm_r_C: wrong B dimension");
     }
     
     // s_C
@@ -721,13 +714,13 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
         cIsNA = true;
         
     } else if (Rf_isComplex(s_C)) {
-        error("gemm_naive_C: complex C not implemented yet");
+        error("gemm_r_C: complex C not implemented yet");
         
     } else if (Rf_isInteger(s_C)) {
-        error("gemm_naive_C: integer C not implemented yet");
+        error("gemm_r_C: integer C not implemented yet");
         
     } else if (!Rf_isReal(s_C) && !Rf_isInteger(s_C)) {
-        error("gemm_naive_C: wrong C type");
+        error("gemm_r_C: wrong C type");
     }
     
     if (gTrace) CERR << "XLENGTH(s_C) = " << XLENGTH(s_C) << endl;
@@ -740,7 +733,7 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     int *dimsC = Rf_isNull(s_dims_C) ? nullptr : INTEGER(s_dims_C);
     
     if (!cIsNA && Rf_isNull(s_dims_C)) {
-        error("gemm_naive_C: no C dimensions");
+        error("gemm_r_C: no C dimensions");
     }
     
     SEXP s_float_C;
@@ -763,25 +756,265 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
     }
     
     if (!cIsNA && dimCountC != 2) {
-        error("gemm_naive_C: wrong C dimension");
+        error("gemm_r_C: wrong C dimension");
     }
     
     // others
     
     if (!Rf_isReal(s_alpha)) {
-        error("gemm_naive_C: wrong alpha type");
+        error("gemm_r_C: wrong alpha type");
     }
     
     if (!Rf_isReal(s_beta)) {
-        error("gemm_naive_C: wrong beta type");
+        error("gemm_r_C: wrong beta type");
     }
     
     if (!Rf_isLogical(s_transposeA)) {
-        error("gemm_naive_C: wrong transposeA type");
+        error("gemm_r_C: wrong transposeA type");
     }
     
     if (!Rf_isLogical(s_transposeB)) {
-        error("gemm_naive_C: wrong transposeB type");
+        error("gemm_r_C: wrong transposeB type");
+    }
+    
+    // --------------- get arg ---------------
+    
+    const double *A = REAL(s_A);
+    const double *B = REAL(s_B);
+    const double *C = cIsNA ? nullptr : REAL(s_C);
+    
+    if (gTrace && XLENGTH(s_A) <= 256) {
+        for (int k = 0; k < XLENGTH(s_A); k++) {
+            CERR << "A[" << k << "] = " << A[k] << endl;
+        }
+    }
+    
+    double alpha = *REAL(s_alpha);
+    double beta = *REAL(s_beta);
+    
+    bool transposeA = !Rf_isNull(s_transposeA) && *LOGICAL(s_transposeA);
+    bool transposeB = !Rf_isNull(s_transposeB) && *LOGICAL(s_transposeB);
+    
+    // --------------- calculate results ---------------
+    
+    size_t outRow = transposeA ? dimsA[1] : dimsA[0];
+    size_t outCol = transposeB ? dimsB[0] : dimsB[1];
+    
+    SEXP result;
+    PROTECT(result = Rf_allocVector(REALSXP, outRow * outCol));
+    resultUnprotectCount++;
+    
+    SEXP s_out_dims;
+    PROTECT(s_out_dims = Rf_allocVector(INTSXP, 2));
+    resultUnprotectCount++;
+    
+    INTEGER(s_out_dims)[0] = (int)outRow;
+    INTEGER(s_out_dims)[1] = (int)outCol;
+    Rf_setAttrib(result, R_DimSymbol, s_out_dims);
+    
+    if (isFloatA || isFloatB || isFloatC) {
+        Rf_setAttrib(result, Rf_install("Csingle"), Rf_ScalarLogical(1));
+    }
+    
+    if (isFloatA || isFloatB || isFloatC) {
+        error("gemm_r_C: single-precision not available");
+        
+    } else {
+        if (!cIsNA && (size_t)XLENGTH(s_C) == outRow * outCol) {
+            memcpy(REAL(result), C, outRow * outCol * sizeof(double));
+            
+        } else {
+            memset(REAL(result), 0, outRow * outCol * sizeof(double));
+        }
+        
+        gemm_r_d(A, dimsA[0], dimsA[1], transposeA, B, dimsB[0], dimsB[1], transposeB, alpha, beta, REAL(result));
+    }
+    
+    // ---------------------------------------------------------------------------------------------
+    
+    UNPROTECT(resultUnprotectCount);
+    
+    if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+    
+    return(result);
+}
+
+SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_transposeB, SEXP s_C, SEXP s_alpha, SEXP s_beta)
+{
+    if (gTrace) CERR << "gemm_clblas_C" << endl;
+    
+    int resultUnprotectCount = 0;
+    
+    // --------------- verify arg type ---------------
+    
+    if (gTrace) CERR << "verify arg type" << endl;
+    
+    {
+        SEXP deviceClass;
+        PROTECT(deviceClass = Rf_getAttrib(s_device, R_ClassSymbol));
+        
+        if (!Rf_isNull(deviceClass) && strcmp("opencl.device", CHAR(STRING_ELT(deviceClass, 0))) != 0) {
+            error("gemm_clblas_C: wrong device class");
+        }
+        
+        UNPROTECT(1);
+    }
+    
+    // s_A
+    
+    if (Rf_isComplex(s_A)) {
+        error("gemm_clblas_C: complex A not implemented yet");
+        
+    } else if (Rf_isInteger(s_A)) {
+        error("gemm_clblas_C: integer A not implemented yet");
+        
+    } else if (!Rf_isReal(s_A) && !Rf_isInteger(s_A)) {
+        error("gemm_clblas_C: wrong A type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_A) = " << XLENGTH(s_A) << endl;
+    
+    SEXP s_dims_A;
+    PROTECT(s_dims_A = Rf_getAttrib(s_A, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    if (Rf_isNull(s_dims_A)) {
+        error("gemm_clblas_C: no A dimensions");
+    }
+    
+    SEXP s_float_A;
+    PROTECT(s_float_A = Rf_getAttrib(s_A, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloatA = !Rf_isNull(s_float_A) && *LOGICAL(s_float_A);
+    
+    int dimCountA = Rf_length(s_dims_A);
+    int *dimsA = INTEGER(s_dims_A);
+    
+    if (gTrace) {
+        CERR << "dimsA = ";
+        for (int k = 0; k < dimCountA; k++) {
+            CERR << dimsA[k] << " ";
+        }
+        CERR << endl;
+    }
+    
+    if (dimCountA != 2) {
+        error("gemm_clblas_C: wrong A dimension");
+    }
+    
+    // s_B
+    
+    if (Rf_isComplex(s_B)) {
+        error("gemm_clblas_C: complex B not implemented yet");
+        
+    } else if (Rf_isInteger(s_B)) {
+        error("gemm_clblas_C: integer B not implemented yet");
+        
+    } else if (!Rf_isReal(s_B) && !Rf_isInteger(s_B)) {
+        error("gemm_clblas_C: wrong B type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_B) = " << XLENGTH(s_B) << endl;
+    
+    SEXP s_dims_B;
+    PROTECT(s_dims_B = Rf_getAttrib(s_B, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    if (Rf_isNull(s_dims_B)) {
+        error("gemm_clblas_C: no B dimensions");
+    }
+    
+    SEXP s_float_B;
+    PROTECT(s_float_B = Rf_getAttrib(s_B, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloatB = !Rf_isNull(s_float_B) && *LOGICAL(s_float_B);
+    
+    int dimCountB = Rf_length(s_dims_B);
+    int *dimsB = INTEGER(s_dims_B);
+    
+    if (gTrace) {
+        CERR << "dimsB = ";
+        for (int k = 0; k < dimCountB; k++) {
+            CERR << dimsB[k] << " ";
+        }
+        CERR << endl;
+    }
+    
+    if (dimCountB != 2) {
+        error("gemm_clblas_C: wrong B dimension");
+    }
+    
+    // s_C
+    
+    bool cIsNA = false;
+    
+    if (Rf_isLogical(s_C) && XLENGTH(s_C) > 0 && *LOGICAL(s_C) == NA_LOGICAL) {
+        cIsNA = true;
+        
+    } else if (Rf_isComplex(s_C)) {
+        error("gemm_clblas_C: complex C not implemented yet");
+        
+    } else if (Rf_isInteger(s_C)) {
+        error("gemm_clblas_C: integer C not implemented yet");
+        
+    } else if (!Rf_isReal(s_C) && !Rf_isInteger(s_C)) {
+        error("gemm_clblas_C: wrong C type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_C) = " << XLENGTH(s_C) << endl;
+    
+    SEXP s_dims_C;
+    PROTECT(s_dims_C = Rf_getAttrib(s_C, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    int dimCountC = Rf_isNull(s_dims_C) ? 0 : Rf_length(s_dims_C);
+    int *dimsC = Rf_isNull(s_dims_C) ? nullptr : INTEGER(s_dims_C);
+    
+    if (!cIsNA && Rf_isNull(s_dims_C)) {
+        error("gemm_clblas_C: no C dimensions");
+    }
+    
+    SEXP s_float_C;
+    PROTECT(s_float_C = Rf_getAttrib(s_C, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloatC = !Rf_isNull(s_float_C) && *LOGICAL(s_float_C);
+    
+    if (gTrace) {
+        if (cIsNA) {
+            CERR << "C = NA" << endl;
+            
+        } else {
+            CERR << "dimsC = ";
+            for (int k = 0; k < dimCountC; k++) {
+                CERR << dimsC[k] << " ";
+            }
+            CERR << endl;
+        }
+    }
+    
+    if (!cIsNA && dimCountC != 2) {
+        error("gemm_clblas_C: wrong C dimension");
+    }
+    
+    // others
+    
+    if (!Rf_isReal(s_alpha)) {
+        error("gemm_clblas_C: wrong alpha type");
+    }
+    
+    if (!Rf_isReal(s_beta)) {
+        error("gemm_clblas_C: wrong beta type");
+    }
+    
+    if (!Rf_isLogical(s_transposeA)) {
+        error("gemm_clblas_C: wrong transposeA type");
+    }
+    
+    if (!Rf_isLogical(s_transposeB)) {
+        error("gemm_clblas_C: wrong transposeB type");
     }
     
     // --------------- get arg ---------------
@@ -842,7 +1075,7 @@ SEXP gemm_clblas_C(SEXP s_device, SEXP s_A, SEXP s_transposeA, SEXP s_B, SEXP s_
         float *outMatrix = (float *)calloc(outRow * outCol, sizeof(float));
         
         if (inMatrixA == nullptr || inMatrixB == nullptr || outMatrix == nullptr) {
-            error("gemm_naive_C: insufficient memory");
+            error("gemm_clblas_C: insufficient memory");
             
         } else {
             float *p = inMatrixA;

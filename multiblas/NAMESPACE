@@ -10,6 +10,6 @@ useDynLib(multiblas, opencl_context_C, opencl_queue_C, opencl_kernel_C, opencl_c
 # export(null.externalptr, is.externalptr.null)
 useDynLib(multiblas, null_externalptr_C, is_externalptr_null_C)
 
-useDynLib(multiblas, crossprod_naive_C, crossprod_blas_C, crossprod_clblas_C)
+useDynLib(multiblas, crossprod_naive_C, crossprod_r_C, crossprod_blas_C, crossprod_clblas_C)
 
-useDynLib(multiblas, gemm_naive_C, gemm_blas_C, gemm_clblas_C, opencl_calc_gemm_C)
+useDynLib(multiblas, gemm_naive_C, gemm_r_C, gemm_blas_C, gemm_clblas_C, opencl_calc_gemm_C)

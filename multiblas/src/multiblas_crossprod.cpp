@@ -9,6 +9,7 @@
 #include "multiblas_crossprod.h"
 #include "opencl_info.h"
 #include "crossprod_naive.h"
+#include "crossprod_r.h"
 #include "crossprod_blas.h"
 #include "crossprod_clblas.h"
 
@@ -248,10 +249,10 @@ SEXP crossprod_blas_C(SEXP s_x)
     }
     
     if (isFloat) {
-#if 1
-        error("crossprod_blas_C: single-precision not available");
+        if (!cblas_ssyrk_available()) {
+            error("crossprod_blas_C: single-precision not available");
+        }
         
-#else
         size_t len = XLENGTH(s_x);
         
         float *inMatrix = (float *)calloc(len, sizeof(float));
@@ -285,10 +286,110 @@ SEXP crossprod_blas_C(SEXP s_x)
             free(outMatrix);
             outMatrix = nullptr;
         }
-#endif
         
     } else {
+        if (!cblas_dsyrk_available()) {
+            error("crossprod_blas_C: double-precision not available");
+        }
+        
         crossprod_blas_d(x, REAL(result), dims[0], dims[1]);
+    }
+    
+    // ---------------------------------------------------------------------------------------------
+    
+    UNPROTECT(resultUnprotectCount);
+    
+    if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+    
+    return(result);
+}
+
+SEXP crossprod_r_C(SEXP s_x)
+{
+    if (gTrace) CERR << "crossprod_r_C" << endl;
+    
+    int resultUnprotectCount = 0;
+    
+    // --------------- verify arg type ---------------
+    
+    if (gTrace) CERR << "verify arg type" << endl;
+    
+    if (Rf_isComplex(s_x)) {
+        Rf_error("crossprod_r_C: complex x not implemented yet");
+        
+    } else if (Rf_isInteger(s_x)) {
+        Rf_error("crossprod_r_C: integer x not implemented yet");
+        
+    } else if (!Rf_isReal(s_x) && !Rf_isInteger(s_x)) {
+        Rf_error("crossprod_r_C: wrong x type");
+    }
+    
+    if (gTrace) CERR << "XLENGTH(s_x) = " << XLENGTH(s_x) << endl;
+    
+    SEXP s_dims;
+    PROTECT(s_dims = Rf_getAttrib(s_x, R_DimSymbol));
+    resultUnprotectCount++;
+    
+    if (Rf_isNull(s_dims)) {
+        Rf_error("crossprod_r_C: no dimensions");
+    }
+    
+    SEXP s_float;
+    PROTECT(s_float = Rf_getAttrib(s_x, Rf_install("Csingle")));
+    resultUnprotectCount++;
+    
+    bool isFloat = !Rf_isNull(s_float) && *LOGICAL(s_float);
+    
+    int dimCount = Rf_length(s_dims);
+    int *dims = INTEGER(s_dims);
+    
+    if (gTrace) {
+        CERR << "dims = ";
+        for (int k = 0; k < dimCount; k++) {
+            CERR << dims[k] << " ";
+        }
+        CERR << endl;
+    }
+    
+    if (dimCount != 2) {
+        Rf_error("crossprod_r_C: wrong dimension");
+    }
+    
+    // --------------- get arg ---------------
+    
+    double *x = REAL(s_x);
+    
+    if (gTrace && XLENGTH(s_x) <= 256) {
+        for (int k = 0; k < XLENGTH(s_x); k++) {
+            CERR << "x[" << k << "] = " << x[k] << endl;
+        }
+    }
+    
+    // --------------- calculate results ---------------
+    
+    size_t ncol = dims[1];
+    
+    SEXP result;
+    PROTECT(result = Rf_allocVector(REALSXP, ncol * ncol));
+    resultUnprotectCount++;
+    
+    SEXP s_out_dims;
+    PROTECT(s_out_dims = Rf_allocVector(INTSXP, 2));
+    resultUnprotectCount++;
+    
+    INTEGER(s_out_dims)[0] = (int)ncol;
+    INTEGER(s_out_dims)[1] = (int)ncol;
+    Rf_setAttrib(result, R_DimSymbol, s_out_dims);
+    
+    if (isFloat) {
+        Rf_setAttrib(result, Rf_install("Csingle"), Rf_ScalarLogical(1));
+    }
+    
+    if (isFloat) {
+        error("crossprod_r_C: single-precision not available");
+        
+    } else {
+        crossprod_r_d(x, REAL(result), dims[0], dims[1]);
     }
     
     // ---------------------------------------------------------------------------------------------

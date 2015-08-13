@@ -95,6 +95,17 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
         options <- multiblas.options("Base")
         option <- options[[1]]
         
+    } else if (type == "C" || type == "c") {
+        if (!is.na(index)) stop("cannot specify index and type")
+        if (!is.na(option)) stop("cannot specify option and type")
+        
+        if (!is.na(processor)) stop("cannot specify processor with this type")
+        
+        type <- "C"
+        
+        options <- multiblas.options("C")
+        option <- options[[1]]
+        
     } else if (type == "clBLAS" || type == "clblas") {
         if (!is.na(index)) stop("cannot specify index and type")
         if (!is.na(option)) stop("cannot specify option and type")
@@ -157,6 +168,13 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
     }
     
     if (blas$type == "R") {
+        blas$crossprod <- function(x) { .Call(crossprod_r_C, x) }
+        
+        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+            .Call(gemm_r_C, A, transposeA, B, transposeB, C, alpha, beta)
+        }
+        
+    } else if (blas$type == "C") {
         blas$crossprod <- function(x) { .Call(crossprod_blas_C, x) }
         
         blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {

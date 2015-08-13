@@ -37,7 +37,23 @@ void printMatrix_f(float *x, size_t ncol, size_t nrow)
     cout << endl;
 }
 
+extern "C" {
+    void foo(int x);
+}
+
+void foo(int x)
+{
+    cout << x << endl;
+}
+
+#include <dlfcn.h>
+
 int main(int argc, const char * argv[]) {
+    void * foo = dlsym(RTLD_DEFAULT, "cblas_dsyrk");
+    
+    cout << (foo == nullptr ? "NO GOT" : "GOT") << endl;
+    
+    
     float *a = (float *)calloc(sizeof(float), 3 * 2);
     for (size_t k = 0; k < 3 * 4; k++) a[k] = k + 1;
     

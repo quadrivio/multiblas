@@ -9,6 +9,9 @@
 #ifndef __multiBLAS_XC__gemm_blas__
 #define __multiBLAS_XC__gemm_blas__
 
+bool cblas_dgemm_available();
+bool cblas_sgemm_available();
+
 void gemm_blas_d(const double *inMatrixA, int nrowA, int ncolA, bool transposeA,
                  const double *inMatrixB, int nrowB, int ncolB, bool transposeB,
                  double alpha, double beta, double *outMatrix);

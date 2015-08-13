@@ -39,6 +39,9 @@ extern "C" {
     SEXP crossprod_naive_C(SEXP s_x);
     
     // call from R
+    SEXP crossprod_r_C(SEXP s_x);
+    
+    // call from R
     SEXP crossprod_blas_C(SEXP s_x);
     
     // call from R
