@@ -123,6 +123,13 @@ int main(int argc, const char * argv[]) {
                                    a, (int)nrowA, (int)ncolA, false,
                                    b, (int)nrowB, (int)ncolB, false,
                                    1.0, 0.0, c, work_item_sizes, 1, 1, 1, 1, verbose);
+            
+//            float *bt = (float *)calloc(sizeof(float), 5 * 3);
+//            transpose_f(b, (int)nrowB, (int)ncolB, bt);
+//            err = opencl_calc_gemm(context, kernel_f, kernel_d, true, queue,
+//                                   a, (int)nrowA, (int)ncolA, false,
+//                                   bt, (int)ncolB, (int)nrowB, true,
+//                                   1.0, 0.0, c, work_item_sizes, 1, 1, 1, 1, verbose);
         }
         
         cout << clErrorToString(err) << endl << endl;

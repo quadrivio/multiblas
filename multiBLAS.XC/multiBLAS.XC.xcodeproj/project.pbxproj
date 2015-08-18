@@ -438,7 +438,7 @@
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					"RPACKAGE=1",
+					"RPACKAGE=0",
 					NO_CLBLAS,
 				);
 				HEADER_SEARCH_PATHS = (

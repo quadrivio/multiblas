@@ -35,8 +35,24 @@ gemm.defaults <- list(
     col.tile.size = 1
 )
 
+get.input <- function(rows, cols, serial = TRUE, float = TRUE) {
+    if (serial) {
+        a <- 1:(rows * cols) + 0.0;
+        
+    } else {
+        a <- rnorm(rows * cols);
+    }
+    
+    dim(a) <- c(rows, cols)
+    if (float) {
+        attr(a, "Csingle") <- TRUE
+    }
+    
+    return(a)
+}
+
 blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label = NA,
-kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
+    kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
 {
     # get option if necessary
     if (!is.na(option[[1]])) {
@@ -170,28 +186,28 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
     if (blas$type == "R") {
         blas$crossprod <- function(x) { .Call(crossprod_r_C, x) }
         
-        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+        blas$gemm <- function(A, B, transposeA = FALSE, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             .Call(gemm_r_C, A, transposeA, B, transposeB, C, alpha, beta)
         }
         
     } else if (blas$type == "C") {
         blas$crossprod <- function(x) { .Call(crossprod_blas_C, x) }
         
-        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+        blas$gemm <- function(A, B, transposeA = FALSE, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             .Call(gemm_blas_C, A, transposeA, B, transposeB, C, alpha, beta)
         }
         
     } else if (blas$type == "Naive") {
         blas$crossprod <- function(x) { .Call(crossprod_naive_C, x) }
         
-        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+        blas$gemm <- function(A, B, transposeA = FALSE, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             .Call(gemm_naive_C, A, transposeA, B, transposeB, C, alpha, beta)
         }
         
     } else if (blas$type == "Base") {
         blas$crossprod <- function(x) { crossprod(x) }
         
-        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+        blas$gemm <- function(A, B, transposeA = FALSE, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             if (transposeA) A <- t(A)
             if (transposeB) B <- t(B)
             if (is.na(C[1])) C <- 0.0
@@ -217,7 +233,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
     } else if (blas$type == "clBLAS") {
         blas$crossprod <- function(x) { .Call(crossprod_clblas_C, blas$device, x) }
         
-        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+        blas$gemm <- function(A, B, transposeA = FALSE, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             .Call(gemm_clblas_C, blas$device, A, transposeA, B, transposeB, C, alpha, beta)
         }
         
@@ -225,7 +241,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
         crossprod.info <- crossprod.defaults
         gemm.info <- gemm.defaults
         
-        if (!is.na(kernel.info)) {
+        if (!is.na(kernel.info[1])) {
             crossprod.info <- replace(crossprod.info, names(kernel.info$crossprod), kernel.info$crossprod)
             gemm.info <- replace(gemm.info, names(kernel.info$gemm), kernel.info$gemm)
         }
@@ -275,8 +291,6 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
         blas$gemm.info <- gemm.info
         
         blas$crossprod <- function(x) {
-            cat("crossprod(x)\n")
-            
             single <- attr(x, "Csingle")
             if (!is.null(single) && single) {
                 if (is.null(crossprod.info$kernel.f)) {
@@ -295,7 +309,7 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
             as.integer(crossprod.info$row.tile.size), as.integer(crossprod.info$col.tile.size), fill.on.host, verbose)
         }
         
-        blas$gemm <- function(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
+        blas$gemm <- function(A, B, transposeA = FALSE, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0) {
             singleA <- attr(A, "Csingle")
             singleB <- attr(B, "Csingle")
             singleC <- attr(C, "Csingle")
@@ -325,6 +339,212 @@ kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
     } else {
         blas$crossprod <- NA
         blas$gemm <- NA
+    }
+    
+    blas$test.crossprod <- function(rows, cols, libs = NA, serial = FALSE, float = TRUE, print = TRUE) {
+        a <- get.input(rows, cols, serial, float)
+
+        if (is.na(libs[1])) {
+            libs <- list(blas)
+        }
+        
+        x <- blas$crossprod(a)
+        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), rms.diff=numeric(0), error=character(0))
+
+        precision <- ifelse(float, "float", "double")
+        numbers <- ifelse(serial, "serial", "rnorm")
+        prefix <- paste(precision, numbers)
+
+        for (lib in libs) {
+            label <- lib$label
+            if (!is.null(lib$work.item.sizes) && !is.na(lib$work.item.sizes)) {
+                label <- paste(label, " (", lib$work.item.sizes[1], ", ", lib$work.item.sizes[2], ")", sep="")
+            }
+
+            y <- tryCatch(list(rms.diff = sqrt(mean((x - lib$crossprod(a))^2)), error = NA),
+                error = function(e) {list(rms.diff = NA, error = e$message)})
+
+            row <- data.frame(label=label, float=float, serial=serial, rms.diff=y$rms.diff, error = y$error)
+            result <- rbind(result, row)
+        }
+        
+        if (print) {
+            for (k in 1:nrow(result)) {
+                row <- result[k, ]
+                if (is.na(row$error)) {
+                    cat(sprintf("%s %dx%d crossprod rms difference = %g for %s\n",
+                        prefix, rows, cols, row$rms.diff, row$label))
+                    
+                } else {
+                    cat(sprintf("%s %dx%d crossprod rms difference NA for %s [%s]\n",
+                        prefix, rows, cols, row$label, row$error))
+                }
+            }
+            
+            invisible(NULL)
+            
+        } else {
+            return(result)
+        }
+    }
+
+    blas$time.crossprod <- function(rows, cols, libs = NA, runs = 3, serial = FALSE, float = TRUE, print = TRUE) {
+        a <- get.input(rows, cols, serial, float)
+        
+        if (is.na(libs[1])) {
+            libs <- list(blas)
+        }
+        
+        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), msec=numeric(0), gflops=numeric(0), error=character(0))
+        
+        precision <- ifelse(float, "float", "double")
+        numbers <- ifelse(serial, "serial", "rnorm")
+        prefix <- paste(precision, numbers)
+
+        ops <- 2.0 * rows * (cols + 0.5 * (cols - 1) * cols)
+       
+        for (lib in libs) {
+            label <- lib$label
+            if (!is.null(lib$work.item.sizes) && !is.na(lib$work.item.sizes)) {
+                label <- paste(label, " (", lib$work.item.sizes[1], ", ", lib$work.item.sizes[2], ")", sep="")
+            }
+
+            for (run in 1:runs) {
+                # suppress any "Timing stopped at:" messages
+                sink("/dev/null")
+                
+                y <- invisible(tryCatch(list(msec = round(1000.0 * system.time({x <- lib$crossprod(a)})[3]), error = NA),
+                    error = function(e) {list(msec = NA, error = e$message)}))
+                
+                sink()
+                
+                row <- data.frame(label=label, float=float, serial=serial, msec=y$msec, gflops = ops / y$msec / 1e6, error = y$error)
+                result <- rbind(result, row)
+            }
+        }
+        
+        if (print) {
+            for (k in 1:nrow(result)) {
+                row <- result[k, ]
+                if (is.na(row$error)) {
+                    cat(sprintf("%s %dx%d cross-product matrix (b = a' * a)  (msec): %6.0f   %7.2f GFLOPS %s\n",
+                        prefix, rows, cols, row$msec, row$gflops, row$label))
+                    
+                } else {
+                    cat(sprintf("%s %dx%d cross-product matrix (b = a' * a)  (msec):     NA  %s\n",
+                        prefix, rows, cols, row$label))
+                }
+            }
+            
+            invisible(NULL)
+            
+        } else {
+            return(result)
+        }
+    }
+    
+    blas$test.gemm <- function(rows1, cols1, cols2, libs = NA, serial = FALSE, float = TRUE, print = TRUE) {
+        a <- get.input(rows1, cols1, serial, float)
+        b <- get.input(cols1, cols2, serial, float)
+        
+        if (is.na(libs[1])) {
+            libs <- list(blas)
+        }
+        
+        x <- blas$gemm(a, b)
+        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), rms.diff=numeric(0), error=character(0))
+        
+        precision <- ifelse(float, "float", "double")
+        numbers <- ifelse(serial, "serial", "rnorm")
+        prefix <- paste(precision, numbers)
+        
+        for (lib in libs) {
+            label <- lib$label
+            if (!is.null(lib$work.item.sizes) && !is.na(lib$work.item.sizes)) {
+                label <- paste(label, " (", lib$work.item.sizes[1], ", ", lib$work.item.sizes[2], ")", sep="")
+            }
+            
+            y <- tryCatch(list(rms.diff = sqrt(mean((x - lib$gemm(a, b))^2)), error = NA),
+            error = function(e) {list(rms.diff = NA, error = e$message)})
+            
+            row <- data.frame(label=label, float=float, serial=serial, rms.diff=y$rms.diff, error = y$error)
+            result <- rbind(result, row)
+        }
+        
+        if (print) {
+            for (k in 1:nrow(result)) {
+                row <- result[k, ]
+                if (is.na(row$error)) {
+                    cat(sprintf("%s %dx%dx%d gemm (c = a * b) rms difference = %g for %s\n",
+                    prefix, rows1, cols1, cols2, row$rms.diff, row$label))
+                    
+                } else {
+                    cat(sprintf("%s %dx%dx%d gemm (c = a * b) rms difference NA for %s [%s]\n",
+                    prefix, rows1, cols1, cols2, row$label, row$error))
+                }
+            }
+            
+            invisible(NULL)
+            
+        } else {
+            return(result)
+        }
+    }
+    
+    blas$time.gemm <- function(rows1, cols1, cols2, libs = NA, runs = 3, serial = FALSE, float = TRUE, print = TRUE) {
+        a <- get.input(rows1, cols1, serial, float)
+        b <- get.input(cols1, cols2, serial, float)
+        
+        if (is.na(libs[1])) {
+            libs <- list(blas)
+        }
+        
+        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), msec=numeric(0), gflops=numeric(0), error=character(0))
+        
+        precision <- ifelse(float, "float", "double")
+        numbers <- ifelse(serial, "serial", "rnorm")
+        prefix <- paste(precision, numbers)
+        
+        ops <- 2.0 * cols2 * rows1 * cols1
+        
+        for (lib in libs) {
+            label <- lib$label
+            if (!is.null(lib$work.item.sizes) && !is.na(lib$work.item.sizes)) {
+                label <- paste(label, " (", lib$work.item.sizes[1], ", ", lib$work.item.sizes[2], ")", sep="")
+            }
+            
+            for (run in 1:runs) {
+                # suppress any "Timing stopped at:" messages
+                sink("/dev/null")
+                
+                y <- invisible(tryCatch(list(msec = round(1000.0 * system.time({x <- lib$gemm(a, b)})[3]), error = NA),
+                error = function(e) {list(msec = NA, error = e$message)}))
+                
+                sink()
+                
+                row <- data.frame(label=label, float=float, serial=serial, msec=y$msec, gflops = ops / y$msec / 1e6, error = y$error)
+                result <- rbind(result, row)
+            }
+        }
+        
+        if (print) {
+            for (k in 1:nrow(result)) {
+                row <- result[k, ]
+                if (is.na(row$error)) {
+                    cat(sprintf("%s %dx%dx%d gemm (c = a * b)  (msec): %6.0f   %7.2f GFLOPS %s\n",
+                    prefix, rows1, cols1, cols2, row$msec, row$gflops, row$label))
+                    
+                } else {
+                    cat(sprintf("%s %dx%dx%d gemm (c = a * b)  (msec):     NA  %s\n",
+                    prefix, rows1, cols1, cols2, row$label))
+                }
+            }
+            
+            invisible(NULL)
+            
+        } else {
+            return(result)
+        }
     }
     
     return(blas)
