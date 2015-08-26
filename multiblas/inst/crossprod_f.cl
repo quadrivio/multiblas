@@ -404,6 +404,763 @@ __kernel void crossprod_f_dot4tile(__private int input_nrow,
     }
 }
 
+__kernel void crossprod_f_dot4tileB(__private int input_nrow,
+                                   __private int input_ncol,
+                                   __global float4* input,
+                                   __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+                }
+            }
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileC(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+                }
+            }
+        }
+        
+//        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+//            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+//                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+//                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+//            }
+//        }
+        
+        output[(output_row + 0)* input_ncol + (output_col + 0)] = sum[0][0];
+        output[(output_col + 0) * input_ncol + (output_row + 0)] = sum[0][0];
+        
+        output[(output_row + 0)* input_ncol + (output_col + 1)] = sum[1][0];
+        output[(output_col + 1) * input_ncol + (output_row + 0)] = sum[1][0];
+        
+        
+        output[(output_row + 1)* input_ncol + (output_col + 0)] = sum[0][1];
+        output[(output_col + 0) * input_ncol + (output_row + 1)] = sum[0][1];
+        
+        output[(output_row + 1)* input_ncol + (output_col + 1)] = sum[1][1];
+        output[(output_col + 1) * input_ncol + (output_row + 1)] = sum[1][1];
+        
+        
+        output[(output_row + 2)* input_ncol + (output_col + 0)] = sum[0][2];
+        output[(output_col + 0) * input_ncol + (output_row + 2)] = sum[0][2];
+        
+        output[(output_row + 2)* input_ncol + (output_col + 1)] = sum[1][2];
+        output[(output_col + 1) * input_ncol + (output_row + 2)] = sum[1][2];
+        
+        
+        output[(output_row + 3)* input_ncol + (output_col + 0)] = sum[0][3];
+        output[(output_col + 0) * input_ncol + (output_row + 3)] = sum[0][3];
+        
+        output[(output_row + 3)* input_ncol + (output_col + 1)] = sum[1][3];
+        output[(output_col + 1) * input_ncol + (output_row + 3)] = sum[1][3];
+        
+    }
+}
+
+__kernel void crossprod_f_dot4tileD(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+//            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+//                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+//                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+//                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+//                }
+//            }
+
+            sum[0][0] += dot(input[index1[0]+ k], input[index2[0]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[0]+ k + 1]);
+            
+            sum[1][0] += dot(input[index1[1]+ k], input[index2[0]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[0]+ k + 1]);
+            
+            sum[0][1] += dot(input[index1[0]+ k], input[index2[1]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[1]+ k + 1]);
+            
+            sum[1][1] += dot(input[index1[1]+ k], input[index2[1]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[1]+ k + 1]);
+            
+            sum[0][2] += dot(input[index1[0]+ k], input[index2[2]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[2]+ k + 1]);
+            
+            sum[1][2] += dot(input[index1[1]+ k], input[index2[2]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[2]+ k + 1]);
+            
+            sum[0][3] += dot(input[index1[0]+ k], input[index2[3]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[3]+ k + 1]);
+            
+            sum[1][3] += dot(input[index1[1]+ k], input[index2[3]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[3]+ k + 1]);
+
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileE(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            //            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            //                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+            //                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+            //                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+            //                }
+            //            }
+            
+            sum[0][0] += dot(input[index1[0]+ k], input[index2[0]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[0]+ k + 1]);
+            
+            sum[1][0] += dot(input[index1[1]+ k], input[index2[0]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[0]+ k + 1]);
+            
+            sum[0][1] += dot(input[index1[0]+ k], input[index2[1]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[1]+ k + 1]);
+            
+            sum[1][1] += dot(input[index1[1]+ k], input[index2[1]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[1]+ k + 1]);
+            
+            sum[0][2] += dot(input[index1[0]+ k], input[index2[2]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[2]+ k + 1]);
+            
+            sum[1][2] += dot(input[index1[1]+ k], input[index2[2]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[2]+ k + 1]);
+            
+            sum[0][3] += dot(input[index1[0]+ k], input[index2[3]+ k]) +
+            dot(input[index1[0]+ k + 1], input[index2[3]+ k + 1]);
+            
+            sum[1][3] += dot(input[index1[1]+ k], input[index2[3]+ k]) +
+            dot(input[index1[1]+ k + 1], input[index2[3]+ k + 1]);
+            
+        }
+        
+//        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+//            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+//                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+//                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+//            }
+//        }
+
+        output[(output_row + 0)* input_ncol + (output_col + 0)] = sum[0][0];
+        output[(output_col + 0) * input_ncol + (output_row + 0)] = sum[0][0];
+        
+        output[(output_row + 0)* input_ncol + (output_col + 1)] = sum[1][0];
+        output[(output_col + 1) * input_ncol + (output_row + 0)] = sum[1][0];
+        
+        
+        output[(output_row + 1)* input_ncol + (output_col + 0)] = sum[0][1];
+        output[(output_col + 0) * input_ncol + (output_row + 1)] = sum[0][1];
+        
+        output[(output_row + 1)* input_ncol + (output_col + 1)] = sum[1][1];
+        output[(output_col + 1) * input_ncol + (output_row + 1)] = sum[1][1];
+        
+        
+        output[(output_row + 2)* input_ncol + (output_col + 0)] = sum[0][2];
+        output[(output_col + 0) * input_ncol + (output_row + 2)] = sum[0][2];
+        
+        output[(output_row + 2)* input_ncol + (output_col + 1)] = sum[1][2];
+        output[(output_col + 1) * input_ncol + (output_row + 2)] = sum[1][2];
+        
+        
+        output[(output_row + 3)* input_ncol + (output_col + 0)] = sum[0][3];
+        output[(output_col + 0) * input_ncol + (output_row + 3)] = sum[0][3];
+        
+        output[(output_row + 3)* input_ncol + (output_col + 1)] = sum[1][3];
+        output[(output_col + 1) * input_ncol + (output_row + 3)] = sum[1][3];
+    
+    }
+}
+
+__kernel void crossprod_f_dot4tileF(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            //            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            //                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+            //                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+            //                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+            //                }
+            //            }
+            
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+                }
+            }
+            
+//            sum[0][0] += dot(input[index1[0]+ k], input[index2[0]+ k]) +
+//            dot(input[index1[0]+ k + 1], input[index2[0]+ k + 1]);
+//            
+//            sum[1][0] += dot(input[index1[1]+ k], input[index2[0]+ k]) +
+//            dot(input[index1[1]+ k + 1], input[index2[0]+ k + 1]);
+//            
+//            sum[0][1] += dot(input[index1[0]+ k], input[index2[1]+ k]) +
+//            dot(input[index1[0]+ k + 1], input[index2[1]+ k + 1]);
+//            
+//            sum[1][1] += dot(input[index1[1]+ k], input[index2[1]+ k]) +
+//            dot(input[index1[1]+ k + 1], input[index2[1]+ k + 1]);
+//            
+//            sum[0][2] += dot(input[index1[0]+ k], input[index2[2]+ k]) +
+//            dot(input[index1[0]+ k + 1], input[index2[2]+ k + 1]);
+//            
+//            sum[1][2] += dot(input[index1[1]+ k], input[index2[2]+ k]) +
+//            dot(input[index1[1]+ k + 1], input[index2[2]+ k + 1]);
+//            
+//            sum[0][3] += dot(input[index1[0]+ k], input[index2[3]+ k]) +
+//            dot(input[index1[0]+ k + 1], input[index2[3]+ k + 1]);
+//            
+//            sum[1][3] += dot(input[index1[1]+ k], input[index2[3]+ k]) +
+//            dot(input[index1[1]+ k + 1], input[index2[3]+ k + 1]);
+            
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileG(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            //            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            //                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+            //                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+            //                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+            //                }
+            //            }
+            
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+//                for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+//                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+//                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+//                }
+
+                sum[0][tile_row] += dot(input[index1[0]+ k], input[index2[tile_row]+ k]) +
+                dot(input[index1[0]+ k + 1], input[index2[0]+ k + 1]);
+
+                sum[1][tile_row] += dot(input[index1[1]+ k], input[index2[tile_row]+ k]) +
+                dot(input[index1[1]+ k + 1], input[index2[tile_row]+ k + 1]);
+            }
+            
+            //            sum[0][0] += dot(input[index1[0]+ k], input[index2[0]+ k]) +
+            //            dot(input[index1[0]+ k + 1], input[index2[0]+ k + 1]);
+            //
+            //            sum[1][0] += dot(input[index1[1]+ k], input[index2[0]+ k]) +
+            //            dot(input[index1[1]+ k + 1], input[index2[0]+ k + 1]);
+            //
+            //            sum[0][1] += dot(input[index1[0]+ k], input[index2[1]+ k]) +
+            //            dot(input[index1[0]+ k + 1], input[index2[1]+ k + 1]);
+            //
+            //            sum[1][1] += dot(input[index1[1]+ k], input[index2[1]+ k]) +
+            //            dot(input[index1[1]+ k + 1], input[index2[1]+ k + 1]);
+            //
+            //            sum[0][2] += dot(input[index1[0]+ k], input[index2[2]+ k]) +
+            //            dot(input[index1[0]+ k + 1], input[index2[2]+ k + 1]);
+            //
+            //            sum[1][2] += dot(input[index1[1]+ k], input[index2[2]+ k]) +
+            //            dot(input[index1[1]+ k + 1], input[index2[2]+ k + 1]);
+            //
+            //            sum[0][3] += dot(input[index1[0]+ k], input[index2[3]+ k]) +
+            //            dot(input[index1[0]+ k + 1], input[index2[3]+ k + 1]);
+            //
+            //            sum[1][3] += dot(input[index1[1]+ k], input[index2[3]+ k]) +
+            //            dot(input[index1[1]+ k + 1], input[index2[3]+ k + 1]);
+            
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileH(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+#pragma unroll
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+#pragma unroll
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+                }
+            }
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileI(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        float *sump;
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            sump = &sum[0][0];
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    *sump += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+                    
+                    sump++;
+                }
+            }
+        }
+        
+        sump = &sum[0][0];
+
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = *sump;
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = *sump++;
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileJ(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+#pragma unroll
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                int index1_tile_col = index1[tile_col];
+#pragma unroll
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    int index2_tile_row = index2[tile_row];
+                    
+                    sum[tile_col][tile_row] += dot(input[index1_tile_col + k], input[index2_tile_row + k]) +
+                    dot(input[index1_tile_col + k + 1], input[index2_tile_row + k + 1]);
+                }
+            }
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileK(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                int index1_tile_col = input_nrow * (output_col + tile_col) / 4;
+
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    int index2_tile_row = input_nrow * (output_row + tile_row) / 4;
+                    
+                    sum[tile_col][tile_row] += dot(input[index1_tile_col + k], input[index2_tile_row + k]) +
+                    dot(input[index1_tile_col + k + 1], input[index2_tile_row + k + 1]);
+                }
+            }
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileL(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            //            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            //                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+            //                    sum[tile_col][tile_row] += dot(input[index1[tile_col]+ k], input[index2[tile_row]+ k]) +
+            //                    dot(input[index1[tile_col]+ k + 1], input[index2[tile_row]+ k + 1]);
+            //                }
+            //            }
+            
+            float4 input_index1_0_k = input[index1[0]+ k];
+            float4 input_index1_0_k_1 = input[index1[0]+ k + 1];
+            float4 input_index1_1_k = input[index1[1]+ k];
+            float4 input_index1_1_k_1 = input[index1[1]+ k + 1];
+            
+            sum[0][0] += dot(input_index1_0_k, input[index2[0]+ k]) +
+            dot(input_index1_0_k_1, input[index2[0]+ k + 1]);
+            
+            sum[1][0] += dot(input_index1_1_k, input[index2[0]+ k]) +
+            dot(input_index1_1_k_1, input[index2[0]+ k + 1]);
+            
+            sum[0][1] += dot(input_index1_0_k, input[index2[1]+ k]) +
+            dot(input_index1_0_k_1, input[index2[1]+ k + 1]);
+            
+            sum[1][1] += dot(input_index1_1_k, input[index2[1]+ k]) +
+            dot(input_index1_1_k_1, input[index2[1]+ k + 1]);
+            
+            sum[0][2] += dot(input_index1_0_k, input[index2[2]+ k]) +
+            dot(input_index1_0_k_1, input[index2[2]+ k + 1]);
+            
+            sum[1][2] += dot(input_index1_1_k, input[index2[2]+ k]) +
+            dot(input_index1_1_k_1, input[index2[2]+ k + 1]);
+            
+            sum[0][3] += dot(input_index1_0_k, input[index2[3]+ k]) +
+            dot(input_index1_0_k_1, input[index2[3]+ k + 1]);
+            
+            sum[1][3] += dot(input_index1_1_k, input[index2[3]+ k]) +
+            dot(input_index1_1_k_1, input[index2[3]+ k + 1]);
+            
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+__kernel void crossprod_f_dot4tileM(__private int input_nrow,
+                                    __private int input_ncol,
+                                    __global float4* input,
+                                    __global float* output) {
+    int output_col = COL_TILE_SIZE * get_global_id(0);
+    int output_row = ROW_TILE_SIZE * get_global_id(1);
+    
+    if (output_col >= output_row) {
+        float sum[COL_TILE_SIZE][ROW_TILE_SIZE];
+        
+        for (int i = 0; i < COL_TILE_SIZE; i++) {
+            for (int j = 0; j < ROW_TILE_SIZE; j++) {
+                sum[i][j] = 0.0f;
+            }
+        }
+        
+        int index1[COL_TILE_SIZE];
+        int index2[ROW_TILE_SIZE];
+        
+        for (int k = 0; k < COL_TILE_SIZE; k++) {
+            index1[k] = input_nrow * (output_col + k) / 4;
+        }
+        for (int k = 0; k < ROW_TILE_SIZE; k++) {
+            index2[k] = input_nrow * (output_row + k) / 4;
+        }
+        
+        for (int k = 0; k < input_nrow / 4; k += 2) {
+            float4 input_index1_k[COL_TILE_SIZE];
+            float4 input_index1_k_1[COL_TILE_SIZE];
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                input_index1_k[tile_col] = input[index1[tile_col] + k];
+                input_index1_k_1[tile_col] = input[index1[tile_col] + k + 1];
+            }
+
+            float4 input_index2_k[ROW_TILE_SIZE];
+            float4 input_index2_k_1[ROW_TILE_SIZE];
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                input_index2_k[tile_row] = input[index2[tile_row] + k];
+                input_index2_k_1[tile_row] = input[index2[tile_row] + k + 1];
+            }
+
+            for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+                for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                    sum[tile_col][tile_row] += dot(input_index1_k[tile_col], input_index2_k[tile_row]) +
+                        dot(input_index1_k_1[tile_col], input_index2_k_1[tile_row]);
+                }
+            }
+        }
+        
+        for (int tile_col = 0; tile_col < COL_TILE_SIZE; tile_col++) {
+            for (int tile_row = 0; tile_row < ROW_TILE_SIZE; tile_row++) {
+                output[(output_row + tile_row) * input_ncol + (output_col + tile_col)] = sum[tile_col][tile_row];
+                output[(output_col + tile_col) * input_ncol + (output_row + tile_row)] = sum[tile_col][tile_row];
+            }
+        }
+    }
+}
+
+
 __kernel void crossprod_f_dot8sum4x2(__private int input_nrow,
                                      __private int input_ncol,
                                      __global float8* input,

@@ -9,7 +9,7 @@
 #          <OWNER> = Quadrivio Corporation
 #
 
-crossprod.defaults <- list(
+crossprod.naive <- list(
     kernel.path.f = system.file("crossprod_f.cl", package = "multiblas"),
     kernel.path.d = system.file("crossprod_d.cl", package = "multiblas"),
     kernel.name.f = "crossprod_f_naive",
@@ -22,7 +22,7 @@ crossprod.defaults <- list(
     col.tile.size = 1
 )
 
-gemm.defaults <- list(
+gemm.naive <- list(
     kernel.path.f = system.file("gemm_f.cl", package = "multiblas"),
     kernel.path.d = system.file("gemm_d.cl", package = "multiblas"),
     kernel.name.f = "gemm_f_naive",
@@ -33,6 +33,32 @@ gemm.defaults <- list(
     row.multiple = 1,
     row.tile.size = 1,
     col.tile.size = 1
+)
+
+crossprod.defaults <- list(
+    kernel.path.f = system.file("crossprod_f.cl", package = "multiblas"),
+    kernel.path.d = system.file("crossprod_d.cl", package = "multiblas"),
+    kernel.name.f = "crossprod_f_dot4sum4x2",
+    kernel.name.d = "crossprod_d_dot4sum4x2",
+    kernel.options = "",
+    work.item.sizes = c(16, 8, 1),
+    vector.size = 4,
+    row.multiple = 2,
+    row.tile.size = 4,
+    col.tile.size = 2
+)
+
+gemm.defaults <- list(
+    kernel.path.f = system.file("gemm_f.cl", package = "multiblas"),
+    kernel.path.d = system.file("gemm_d.cl", package = "multiblas"),
+    kernel.name.f = "gemm_f_dot4sum4x2",
+    kernel.name.d = "gemm_d_dot4sum4x2",
+    kernel.options = "",
+    work.item.sizes = c(16, 8, 1),
+    vector.size = 4,
+    row.multiple = 2,
+    row.tile.size = 4,
+    col.tile.size = 2
 )
 
 get.input <- function(rows, cols, serial = TRUE, float = TRUE) {
@@ -52,7 +78,7 @@ get.input <- function(rows, cols, serial = TRUE, float = TRUE) {
 }
 
 blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label = NA,
-    kernel.info = NA, fill.on.host = FALSE, verbose = FALSE)
+    kernel.info = NA, fill.on.host = TRUE, verbose = FALSE)
 {
     # get option if necessary
     if (!is.na(option[[1]])) {
