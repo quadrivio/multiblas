@@ -49,6 +49,21 @@ void foo(int x)
 #include <dlfcn.h>
 
 int main(int argc, const char * argv[]) {
+    if (true) {
+        cout << "numeric_limits<short>::digits = " << numeric_limits<short>::digits << endl;
+        cout << "numeric_limits<unsigned short>::digits = " << numeric_limits<unsigned short>::digits << endl;
+        cout << "numeric_limits<float>::digits = " << numeric_limits<float>::digits << endl;
+        cout << "numeric_limits<double>::digits = " << numeric_limits<double>::digits << endl;
+        cout << "numeric_limits<float>::max_digits10 = " << numeric_limits<float>::max_digits10 << endl;
+        cout << "numeric_limits<double>::max_digits10 = " << numeric_limits<double>::max_digits10 << endl;
+        cout << endl;
+        cout << "pow(2.0, numeric_limits<short>::digits) - 1.0 = " << (unsigned long long)pow(2.0, numeric_limits<short>::digits) - 1 << endl;
+        cout << "pow(2.0, numeric_limits<unsigned short>::digits) - 1.0 = " << (unsigned long long)pow(2.0, numeric_limits<unsigned short>::digits) - 1 << endl;
+        cout << "pow(2.0, numeric_limits<float>::digits) - 1.0 = " << (unsigned long long)pow(2.0, numeric_limits<float>::digits) - 1 << endl;
+        cout << "pow(2.0, numeric_limits<double>::digits) - 1.0 = " << (unsigned long long)pow(2.0, numeric_limits<double>::digits) - 1 << endl;
+        
+        exit(0);
+    }
     void * foo = dlsym(RTLD_DEFAULT, "cblas_dsyrk");
     
     cout << (foo == nullptr ? "NO GOT" : "GOT") << endl;
