@@ -49,7 +49,7 @@ void foo(int x)
 #include <dlfcn.h>
 
 int main(int argc, const char * argv[]) {
-    if (true) {
+    if (false) {
         cout << "numeric_limits<short>::digits = " << numeric_limits<short>::digits << endl;
         cout << "numeric_limits<unsigned short>::digits = " << numeric_limits<unsigned short>::digits << endl;
         cout << "numeric_limits<float>::digits = " << numeric_limits<float>::digits << endl;

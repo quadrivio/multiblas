@@ -61,12 +61,33 @@ gemm.defaults <- list(
     col.tile.size = 2
 )
 
-get.input <- function(rows, cols, serial = TRUE, float = TRUE) {
-    if (serial) {
+get.input <- function(rows, cols, vector.length = NA, scale = NA, input = "round", float = TRUE) {
+   if (input == "serial") {
         a <- 1:(rows * cols) + 0.0;
         
-    } else {
+    } else if (input == "rnorm"){
         a <- rnorm(rows * cols);
+        
+    } else {
+        if (is.na(vector.length)) {
+            vector.length <- rows
+        }
+        
+        if (!is.na(scale)) {
+            vector.length <- vector.length + 1
+            
+        } else {
+            scale <- 1.0
+        }
+        
+        if (float) {
+            max <- floor(sqrt(16777215 / vector.length / scale)) # 16777215 = numeric_limits<float>::digits) - 1.0
+            
+        } else {
+            max <- floor(sqrt(9007199254740991.0 / vector.length / scale)) # 9007199254740991 = numeric_limits<float>::digits) - 1.0
+        }
+        
+        a <- round(runif(rows * cols, max = max, min = -max))
     }
     
     dim(a) <- c(rows, cols)
@@ -367,18 +388,18 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         blas$gemm <- NA
     }
     
-    blas$test.crossprod <- function(rows, cols, libs = NA, serial = FALSE, float = TRUE, print = TRUE) {
-        a <- get.input(rows, cols, serial, float)
+    blas$test.crossprod <- function(rows, cols, libs = NA, input = "round", float = TRUE, print = TRUE) {
+        a <- get.input(rows, cols, rows, scale = NA, input, float)
 
         if (is.na(libs[1])) {
             libs <- list(blas)
         }
         
         x <- blas$crossprod(a)
-        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), rms.diff=numeric(0), error=character(0))
+        result <- data.frame(rows=numeric(0), cols=numeric(0), label=character(0), float=logical(0), input=character(0), rms.diff=numeric(0), error=character(0))
 
         precision <- ifelse(float, "float", "double")
-        numbers <- ifelse(serial, "serial", "rnorm")
+        numbers <- input
         prefix <- paste(precision, numbers)
 
         for (lib in libs) {
@@ -390,7 +411,7 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
             y <- tryCatch(list(rms.diff = sqrt(mean((x - lib$crossprod(a))^2)), error = NA),
                 error = function(e) {list(rms.diff = NA, error = e$message)})
 
-            row <- data.frame(label=label, float=float, serial=serial, rms.diff=y$rms.diff, error = y$error)
+            row <- data.frame(rows=rows, cols=cols, label=label, float=float, input=input, rms.diff=y$rms.diff, error = y$error)
             result <- rbind(result, row)
         }
         
@@ -414,17 +435,17 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         }
     }
 
-    blas$time.crossprod <- function(rows, cols, libs = NA, runs = 3, serial = FALSE, float = TRUE, print = TRUE) {
-        a <- get.input(rows, cols, serial, float)
+    blas$time.crossprod <- function(rows, cols, libs = NA, runs = 3, input = "round", float = TRUE, print = TRUE) {
+        a <- get.input(rows, cols, rows, scale = NA, input, float)
         
         if (is.na(libs[1])) {
             libs <- list(blas)
         }
         
-        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), msec=numeric(0), gflops=numeric(0), error=character(0))
+        result <- data.frame(label=character(0), float=logical(0), input=character(0), msec=numeric(0), gflops=numeric(0), error=character(0))
         
         precision <- ifelse(float, "float", "double")
-        numbers <- ifelse(serial, "serial", "rnorm")
+        numbers <- input
         prefix <- paste(precision, numbers)
 
         ops <- 2.0 * rows * (cols + 0.5 * (cols - 1) * cols)
@@ -444,7 +465,7 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
                 
                 sink()
                 
-                row <- data.frame(label=label, float=float, serial=serial, msec=y$msec, gflops = ops / y$msec / 1e6, error = y$error)
+                row <- data.frame(label=label, float=float, input=input, msec=y$msec, gflops = ops / y$msec / 1e6, error = y$error)
                 result <- rbind(result, row)
             }
         }
@@ -469,19 +490,35 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         }
     }
     
-    blas$test.gemm <- function(rows1, cols1, cols2, libs = NA, serial = FALSE, float = TRUE, print = TRUE) {
-        a <- get.input(rows1, cols1, serial, float)
-        b <- get.input(cols1, cols2, serial, float)
+    blas$test.gemm <- function(rows1, cols1, cols2, transposeA = FALSE, transposeB = FALSE,
+            alpha = 1.0, beta = 0.0, libs = NA, input = "round", float = TRUE, print = TRUE) {
+        a <- get.input(rows1, cols1, cols1, alpha, input, float)
+        b <- get.input(cols1, cols2, cols1, alpha, input, float)
+        
+        if (transposeA) {
+            a <- t(a)
+        }
+        
+        if (transposeB) {
+            b <- t(b)
+        }
         
         if (is.na(libs[1])) {
             libs <- list(blas)
         }
         
-        x <- blas$gemm(a, b)
-        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), rms.diff=numeric(0), error=character(0))
+        if (beta == 0.0) {
+            c <- NA
+            
+        } else {
+            c <- get.input(rows1, cols2, cols1, beta, input, float)
+        }
+        
+        x <- blas$gemm(a, b, transposeA, transposeB, c, alpha, beta)
+        result <- data.frame(rows1=numeric(0), cols1=numeric(0), cols2=numeric(0), label=character(0), float=logical(0), input=character(0), rms.diff=numeric(0), error=character(0))
         
         precision <- ifelse(float, "float", "double")
-        numbers <- ifelse(serial, "serial", "rnorm")
+        numbers <- input
         prefix <- paste(precision, numbers)
         
         for (lib in libs) {
@@ -490,10 +527,10 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
                 label <- paste(label, " (", lib$work.item.sizes[1], ", ", lib$work.item.sizes[2], ")", sep="")
             }
             
-            y <- tryCatch(list(rms.diff = sqrt(mean((x - lib$gemm(a, b))^2)), error = NA),
+            y <- tryCatch(list(rms.diff = sqrt(mean((x - lib$gemm(a, b, transposeA, transposeB, c, alpha, beta))^2)), error = NA),
             error = function(e) {list(rms.diff = NA, error = e$message)})
             
-            row <- data.frame(label=label, float=float, serial=serial, rms.diff=y$rms.diff, error = y$error)
+            row <- data.frame(rows1=rows1, cols1=cols1, cols2=cols2, label=label, float=float, input=input, rms.diff=y$rms.diff, error = y$error)
             result <- rbind(result, row)
         }
         
@@ -517,20 +554,53 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         }
     }
     
-    blas$time.gemm <- function(rows1, cols1, cols2, libs = NA, runs = 3, serial = FALSE, float = TRUE, print = TRUE) {
-        a <- get.input(rows1, cols1, serial, float)
-        b <- get.input(cols1, cols2, serial, float)
-        
+    blas$time.gemm <- function(rows1, cols1, cols2, transposeA = FALSE, transposeB = FALSE,
+            alpha = 1.0, beta = 0.0, libs = NA, runs = 3, input = "round", float = TRUE, print = TRUE) {
+        a <- get.input(rows1, cols1, cols1, alpha, input, float)
+        b <- get.input(cols1, cols2, cols1, alpha, input, float)
+
+
+        if (transposeA) {
+            a <- t(a)
+        }
+
+        if (transposeB) {
+            b <- t(b)
+        }
+
         if (is.na(libs[1])) {
             libs <- list(blas)
         }
         
-        result <- data.frame(label=character(0), float=logical(0), serial=logical(0), msec=numeric(0), gflops=numeric(0), error=character(0))
+        if (beta == 0.0) {
+            c <- NA
+            
+        } else {
+            c <- get.input(rows1, cols2, cols1, beta, input, float)
+        }
+        
+        result <- data.frame(label=character(0), float=logical(0), input=character(0), msec=numeric(0), gflops=numeric(0), error=character(0))
         
         precision <- ifelse(float, "float", "double")
-        numbers <- ifelse(serial, "serial", "rnorm")
+        numbers <- input
         prefix <- paste(precision, numbers)
+
+        if (transposeA) {
+            prefix <- paste(prefix, "tA")
+        }
+
+        if (transposeB) {
+            prefix <- paste(prefix, "tB")
+        }
         
+        if (alpha != 1.0) {
+            prefix <- paste(prefix, "alpha =", alpha)
+        }
+        
+        if (beta != 0.0) {
+            prefix <- paste(prefix, "beta =", beta)
+        }
+
         ops <- 2.0 * cols2 * rows1 * cols1
         
         for (lib in libs) {
@@ -543,12 +613,12 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
                 # suppress any "Timing stopped at:" messages
                 sink("/dev/null")
                 
-                y <- invisible(tryCatch(list(msec = round(1000.0 * system.time({x <- lib$gemm(a, b)})[3]), error = NA),
+                y <- invisible(tryCatch(list(msec = round(1000.0 * system.time({x <- lib$gemm(a, b, transposeA, transposeB, c, alpha, beta)})[3]), error = NA),
                 error = function(e) {list(msec = NA, error = e$message)}))
                 
                 sink()
                 
-                row <- data.frame(label=label, float=float, serial=serial, msec=y$msec, gflops = ops / y$msec / 1e6, error = y$error)
+                row <- data.frame(label=label, float=float, input=input, msec=y$msec, gflops = ops / y$msec / 1e6, error = y$error)
                 result <- rbind(result, row)
             }
         }

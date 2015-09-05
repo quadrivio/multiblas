@@ -669,3 +669,59 @@ void getFullSizes(size_t& full_rowsA, size_t& full_colsA, size_t& full_colsB,
         ", work_item_sizes=(" << work_item_sizes[0] << ", " << work_item_sizes[1] << ", " << work_item_sizes[2] << ")" << endl;
     }
 }
+
+void getFullSizes_atia(bool transposeA, bool transposeB,
+                  size_t& full_rowsA, size_t& full_colsA, size_t& full_rowsB, size_t& full_colsB,
+                  size_t rowsA,  size_t colsA, size_t rowsB, size_t colsB,
+                  size_t vector_size, size_t row_multiple, size_t row_tile_size, size_t col_tile_size,
+                  const std::vector<size_t>& work_item_sizes)
+{
+    // values after transposing, if any (atia)
+    size_t atia_nrowA;
+    size_t atia_ncolA;
+    size_t atia_nrowB;
+    size_t atia_ncolB;
+    
+    if (transposeA) {
+        atia_nrowA = colsA;
+        atia_ncolA = rowsA;
+        
+    } else {
+        atia_nrowA = rowsA;
+        atia_ncolA = colsA;
+    }
+    
+    if (transposeB) {
+        atia_nrowB = colsB;
+        atia_ncolB = rowsB;
+        
+    } else {
+        atia_nrowB = rowsB;
+        atia_ncolB = colsB;
+    }
+    
+    size_t atia_full_nrowA = 0;
+    size_t atia_full_ncolA = 0;
+    size_t atia_full_ncolB = 0;
+    
+    getFullSizes(atia_full_nrowA, atia_full_ncolA, atia_full_ncolB, atia_nrowA, atia_ncolA, atia_ncolB,
+                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
+    
+    if (transposeA) {
+        full_rowsA = atia_full_ncolA;
+        full_colsA = atia_full_nrowA;
+        
+    } else {
+        full_rowsA = atia_full_nrowA;
+        full_colsA = atia_full_ncolA;
+    }
+    
+    if (transposeB) {
+        full_colsB = atia_full_ncolA;
+        full_rowsB = atia_full_ncolB;
+        
+    } else {
+        full_colsB = atia_full_ncolB;
+        full_rowsB = atia_full_ncolA;
+    }
+}

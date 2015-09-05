@@ -91,12 +91,25 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
 
     size_t full_nrowA = 0;
     size_t full_ncolA = 0;
+    size_t full_nrowB = 0;
+    size_t full_ncolB = 0;
+    
+    getFullSizes_atia(transposeA, transposeB,
+                      full_nrowA, full_ncolA, full_nrowB, full_ncolB,
+                      nrowA, ncolA, nrowB, ncolB,
+                      vector_size, row_multiple, row_tile_size, col_tile_size,
+                      work_item_sizes);
+
+    /*
+    size_t full_nrowA = 0;
+    size_t full_ncolA = 0;
     size_t full_ncolB = 0;
 
     getFullSizes(full_nrowA, full_ncolA, full_ncolB, nrowA, ncolA, ncolB,
                  vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
     
     size_t full_nrowB = full_ncolA;
+    */
     
     // ----- inputA -----
     

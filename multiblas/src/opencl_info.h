@@ -38,4 +38,10 @@ void getFullSizes(size_t& full_rowsA, size_t& full_colsA, size_t& full_colsB,
                   size_t vector_size, size_t row_multiple, size_t row_tile_size, size_t col_tile_size,
                   const std::vector<size_t>& work_item_sizes);
 
+void getFullSizes_atia(bool transposeA, bool transposeB,
+                       size_t& full_rowsA, size_t& full_colsA, size_t& full_rowsB, size_t& full_colsB,
+                       size_t rowsA,  size_t colsA, size_t rowsB, size_t colsB,
+                       size_t vector_size, size_t row_multiple, size_t row_tile_size, size_t col_tile_size,
+                       const std::vector<size_t>& work_item_sizes);
+
 #endif /* defined(__template__opencl_info__) */

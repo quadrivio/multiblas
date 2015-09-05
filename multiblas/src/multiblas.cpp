@@ -19,7 +19,7 @@
 
 // ========== Globals ==============================================================================
 
-bool gTrace = false;    // for debugging
+bool gTrace = true;    // for debugging
 
 #if RPACKAGE
 
@@ -33,6 +33,8 @@ bool gTrace = false;    // for debugging
 #include <iomanip>
 #include <cstring>
 #include <vector>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 #ifdef USE_TIMING
@@ -831,7 +833,9 @@ SEXP opencl_queue_C(SEXP s_context, SEXP s_device)
     if (gTrace) CERR << "queue = " << hex << (unsigned long long)(void *)queue << dec << endl;
     
     if (err != CL_SUCCESS) {
-        error("opencl_queue_C: cannot create queue");
+        std::stringstream sst;
+        sst << "opencl_queue_C: cannot create queue " << clErrorToString(err);
+        error(sst.str().c_str());
     }
     
     // --------------- package results ---------------
@@ -1891,65 +1895,89 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     
     cl_int err = CL_SUCCESS;
     
+    // values after transposing, if any (atia)
     size_t full_nrowA = 0;
     size_t full_ncolA = 0;
+    size_t full_nrowB = 0;
     size_t full_ncolB = 0;
-    
-    getFullSizes(full_nrowA, full_ncolA, full_ncolB, nrowA, ncolA, ncolB,
-                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
-    
-    size_t full_nrowB = full_ncolA;
-    
-    // matrix A
+
+    getFullSizes_atia(transposeA, transposeB,
+                           full_nrowA, full_ncolA, full_nrowB, full_ncolB,
+                           nrowA, ncolA, nrowB, ncolB,
+                           vector_size, row_multiple, row_tile_size, col_tile_size,
+                           work_item_sizes);
+
     
     /*
-    size_t full_nrowA = vector_size * ((nrowA + vector_size - 1) / vector_size);
+    size_t atia_nrowA;
+    size_t atia_ncolA;
+    size_t atia_nrowB;
+    size_t atia_ncolB;
     
-    // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
-    size_t gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
-    while (gcd > 1 && col_tile_size % gcd != 0 && row_tile_size % gcd != 0) gcd--;
-    size_t lcm = col_tile_size * row_tile_size / gcd;
+    if (transposeA) {
+        atia_nrowA = ncolA;
+        atia_ncolA = nrowA;
+        
+    } else {
+        atia_nrowA = nrowA;
+        atia_ncolA = ncolA;
+    }
     
-    size_t full_ncolA = (ncolA + lcm - 1) / lcm;
+    if (transposeB) {
+        atia_nrowB = ncolB;
+        atia_ncolB = nrowB;
+        
+    } else {
+        atia_nrowB = nrowB;
+        atia_ncolB = ncolB;
+    }
+
+    size_t atia_full_nrowA = 0;
+    size_t atia_full_ncolA = 0;
+    size_t atia_full_ncolB = 0;
+
+    getFullSizes(atia_full_nrowA, atia_full_ncolA, atia_full_ncolB, atia_nrowA, atia_ncolA, atia_ncolB,
+                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
+
+    size_t full_nrowA = 0;
+    size_t full_ncolA = 0;
+    size_t full_nrowB = 0;
+    size_t full_ncolB = 0;
+
+    if (transposeA) {
+        full_nrowA = atia_full_ncolA;
+        full_ncolA = atia_full_nrowA;
+        
+    } else {
+        full_nrowA = atia_full_nrowA;
+        full_ncolA = atia_full_ncolA;
+    }
     
-    full_ncolA = work_item_sizes[0] * ((full_ncolA + work_item_sizes[0] - 1) / work_item_sizes[0]);
-    full_ncolA = work_item_sizes[1] * ((full_ncolA + work_item_sizes[1] - 1) / work_item_sizes[1]);
-    
-    full_ncolA *= lcm;
-//    full_ncolA = col_multiple * ((full_ncolA + col_multiple - 1) / col_multiple);
+    if (transposeB) {
+        full_ncolB = atia_full_ncolA;
+        full_nrowB = atia_full_ncolB;
+        
+    } else {
+        full_ncolB = atia_full_ncolB;
+        full_nrowB = atia_full_ncolA;
+    }
     */
     
     if (gTrace) {
         CERR << "opencl_calc_gemm_C: nrowA = " << nrowA << ", ncolA = " << ncolA << ", full_nrowA = " << full_nrowA << ", full_ncolA = " << full_ncolA << std::endl;
     }
     
-    // matrix B
-    
-    /*
-    size_t full_nrowB = vector_size * ((nrowB + vector_size - 1) / vector_size);
-    
-    // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
-    gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
-    while (gcd > 1 && col_tile_size % gcd != 0 && row_tile_size % gcd != 0) gcd--;
-    lcm = col_tile_size * row_tile_size / gcd;
-    
-    size_t full_ncolB = (ncolB + lcm - 1) / lcm;
-    
-    full_ncolB = work_item_sizes[0] * ((full_ncolB + work_item_sizes[0] - 1) / work_item_sizes[0]);
-    full_ncolB = work_item_sizes[1] * ((full_ncolB + work_item_sizes[1] - 1) / work_item_sizes[1]);
-    
-    full_ncolB *= lcm;
-//    full_ncolB = col_multiple * ((full_ncolB + col_multiple - 1) / col_multiple);
-    */
-    
     if (gTrace) {
-        CERR << "opencl_calc_gemm_C: nrowB = " << nrowB << ", ncolB = " << ncolB << ", full_nrowB = " << full_nrowB << ", full_ncolB = " << full_ncolB << std::endl;
+        CERR << "                    nrowB = " << nrowB << ", ncolB = " << ncolB << ", full_nrowB = " << full_nrowB << ", full_ncolB = " << full_ncolB << std::endl;
     }
     
     // matrix out
     
     size_t full_nrow_out = transposeA ? full_ncolA : full_nrowA;
     size_t full_ncol_out = transposeB ? full_nrowB : full_ncolB;
+    
+//    size_t full_nrow_out = atia_full_nrowA;
+//    size_t full_ncol_out = atia_full_ncolB;
 
 //    CERR << "full_nrow_out = " << full_nrow_out << ", full_ncol_out = " << full_ncol_out << endl;
 
