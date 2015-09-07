@@ -476,6 +476,14 @@ std::string getKernelWorkGroupInfoString(cl_kernel kernel, cl_device_id device, 
     return(result.str());
 }
 
+bool isContextValid(cl_context context)
+{
+    uint count;
+    cl_int err = clGetContextInfo(context, CL_CONTEXT_REFERENCE_COUNT, sizeof(uint), &count, nullptr);
+    
+    return err != CL_INVALID_CONTEXT;
+}
+
 std::string clErrorToString(cl_int error)
 {
     std::string err_str;

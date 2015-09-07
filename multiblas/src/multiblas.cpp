@@ -741,7 +741,7 @@ SEXP opencl_context_C(SEXP s_device)
 
 void queue_finalizer(SEXP s_queue)
 {
-    if (gTrace) CERR << "queue_finalizer" << endl;
+    /*if (gTrace)*/ CERR << "queue_finalizer" << endl;
     
     // --------------- verify arg type ---------------
     
@@ -763,8 +763,12 @@ void queue_finalizer(SEXP s_queue)
     // --------------- finalize ---------------
     
     if (queue != nullptr) {
-        clReleaseCommandQueue(queue);
+        cl_int err = clReleaseCommandQueue(queue);
         R_ClearExternalPtr(s_queue);
+        
+        if (err != CL_SUCCESS) {
+            error("queue_finalizer: cannot release queue");
+        }
     }
 }
 
@@ -833,6 +837,11 @@ SEXP opencl_queue_C(SEXP s_context, SEXP s_device)
     if (gTrace) CERR << "queue = " << hex << (unsigned long long)(void *)queue << dec << endl;
     
     if (err != CL_SUCCESS) {
+        CERR << "device = " << hex << (unsigned long long)(void *)device << dec << endl;
+        CERR << "context = " << hex << (unsigned long long)(void *)context << dec << endl;
+        CERR << "Device: " << getDeviceInfoString(device, CL_DEVICE_NAME) << std::endl;
+        CERR << "Context valid: " << (isContextValid(context) ? "TRUE" : "FALSE") << std::endl;
+        
         std::stringstream sst;
         sst << "opencl_queue_C: cannot create queue " << clErrorToString(err);
         error(sst.str().c_str());

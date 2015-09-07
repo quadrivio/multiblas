@@ -26,6 +26,8 @@ std::string getDeviceInfoString(cl_device_id id, cl_device_info param_name, cl_i
 std::string getCommandQueueInfoString(cl_command_queue id, cl_command_queue_info param_name, cl_int *error = NULL);
 std::string getKernelWorkGroupInfoString(cl_kernel kernel, cl_device_id device, cl_kernel_work_group_info param_name, cl_int *error);
 
+bool isContextValid(cl_context context);
+
 std::string clErrorToString(cl_int error);
 
 const uint32_t UNDEFINED_INFO = UINT_MAX;
