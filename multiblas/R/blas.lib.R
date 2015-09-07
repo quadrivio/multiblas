@@ -170,7 +170,11 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         option <- options[[1]]
         
     } else if (type == "clBLAS" || type == "clblas") {
-        if (!is.na(index)) stop("cannot specify index and type")
+        # make sure any previous unused OpenCL objects are finalized;
+        # prevents problems if OpenCL calculation is stopped
+        invisible(gc())
+
+    if (!is.na(index)) stop("cannot specify index and type")
         if (!is.na(option)) stop("cannot specify option and type")
         
         type <- "clBLAS"
@@ -184,6 +188,10 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         }
         
     } else if (type == "OpenCL" || type == "opencl") {
+        # make sure any previous unused OpenCL objects are finalized;
+        # prevents problems if OpenCL calculation is stopped
+        invisible(gc())
+
         if (!is.na(index)) stop("cannot specify index and type")
         if (!is.na(option)) stop("cannot specify option and type")
         
