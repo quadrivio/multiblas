@@ -215,14 +215,21 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
             CERR << "clCreateBuffer cl_output_vector:" << std::endl;
         }
         
-        if (is_float) {
-            cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-                                              full_nrowC * full_ncolC * sizeof(float), output_matrix_f, &err);
-            
+        if ((size_t)ncolC == full_ncolC && (size_t)nrowC == full_nrowC) {
+            if (is_float) {
+                cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                                  full_nrowC * full_ncolC * sizeof(float), output_matrix_f, &err);
+                
+            } else {
+                cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                                  full_nrowC * full_ncolC * sizeof(double), output_matrix_d, &err);
+            }
+
         } else {
-            cl_output_matrix = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-                                              full_nrowC * full_ncolC * sizeof(double), output_matrix_d, &err);
+            CERR << "NOT IMPLEMENTED YET" << std::endl;
+            
         }
+        
     }
 
     // initiate calculation

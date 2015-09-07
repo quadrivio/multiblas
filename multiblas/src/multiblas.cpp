@@ -1906,62 +1906,6 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                            nrowA, ncolA, nrowB, ncolB,
                            vector_size, row_multiple, row_tile_size, col_tile_size,
                            work_item_sizes);
-
-    
-    /*
-    size_t atia_nrowA;
-    size_t atia_ncolA;
-    size_t atia_nrowB;
-    size_t atia_ncolB;
-    
-    if (transposeA) {
-        atia_nrowA = ncolA;
-        atia_ncolA = nrowA;
-        
-    } else {
-        atia_nrowA = nrowA;
-        atia_ncolA = ncolA;
-    }
-    
-    if (transposeB) {
-        atia_nrowB = ncolB;
-        atia_ncolB = nrowB;
-        
-    } else {
-        atia_nrowB = nrowB;
-        atia_ncolB = ncolB;
-    }
-
-    size_t atia_full_nrowA = 0;
-    size_t atia_full_ncolA = 0;
-    size_t atia_full_ncolB = 0;
-
-    getFullSizes(atia_full_nrowA, atia_full_ncolA, atia_full_ncolB, atia_nrowA, atia_ncolA, atia_ncolB,
-                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
-
-    size_t full_nrowA = 0;
-    size_t full_ncolA = 0;
-    size_t full_nrowB = 0;
-    size_t full_ncolB = 0;
-
-    if (transposeA) {
-        full_nrowA = atia_full_ncolA;
-        full_ncolA = atia_full_nrowA;
-        
-    } else {
-        full_nrowA = atia_full_nrowA;
-        full_ncolA = atia_full_ncolA;
-    }
-    
-    if (transposeB) {
-        full_ncolB = atia_full_ncolA;
-        full_nrowB = atia_full_ncolB;
-        
-    } else {
-        full_ncolB = atia_full_ncolB;
-        full_nrowB = atia_full_ncolA;
-    }
-    */
     
     if (gTrace) {
         CERR << "opencl_calc_gemm_C: nrowA = " << nrowA << ", ncolA = " << ncolA << ", full_nrowA = " << full_nrowA << ", full_ncolA = " << full_ncolA << std::endl;
@@ -2062,7 +2006,7 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                             *p++ = 0.0;
                         }
                     }
-                    for (size_t col = outRow; col < full_ncol_out; col++) {
+                    for (size_t col = outCol; col < full_ncol_out; col++) {
                         float *p = outMatrix + col * full_nrow_out;
                         for (size_t row = 0; row < full_nrow_out; row++) {
                             *p++ = 0;
@@ -2195,10 +2139,10 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                             *p++ = 0.0;
                         }
                     }
-                    for (size_t col = outRow; col < full_ncol_out; col++) {
+                    for (size_t col = outCol; col < full_ncol_out; col++) {
                         double *p = outMatrix + col * full_nrow_out;
                         for (size_t row = 0; row < full_nrow_out; row++) {
-                            *p++ = 0;
+                            *p++ = 0.0;
                         }
                     }
                 }
