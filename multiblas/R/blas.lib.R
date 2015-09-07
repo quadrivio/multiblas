@@ -515,7 +515,9 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
         }
         
         x <- blas$gemm(a, b, transposeA, transposeB, c, alpha, beta)
-        result <- data.frame(rows1=numeric(0), cols1=numeric(0), cols2=numeric(0), label=character(0), float=logical(0), input=character(0), rms.diff=numeric(0), error=character(0))
+        result <- data.frame(rows1=numeric(0), cols1=numeric(0), cols2=numeric(0),
+            alpha=numeric(0), beta=numeric(0), tA = logical(0), tB = logical(0),
+            label=character(0), float=logical(0), input=character(0), rms.diff=numeric(0), error=character(0))
         
         precision <- ifelse(float, "float", "double")
         numbers <- input
@@ -530,7 +532,8 @@ blas.lib <- function(type = NA, processor = NA, index = NA, option = NA, label =
             y <- tryCatch(list(rms.diff = sqrt(mean((x - lib$gemm(a, b, transposeA, transposeB, c, alpha, beta))^2)), error = NA),
             error = function(e) {list(rms.diff = NA, error = e$message)})
             
-            row <- data.frame(rows1=rows1, cols1=cols1, cols2=cols2, label=label, float=float, input=input, rms.diff=y$rms.diff, error = y$error)
+            row <- data.frame(rows1=rows1, cols1=cols1, cols2=cols2, alpha=alpha, beta=beta,
+                tA = transposeA, tB = transposeB,label=label, float=float, input=input, rms.diff=y$rms.diff, error = y$error)
             result <- rbind(result, row)
         }
         
