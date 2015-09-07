@@ -220,6 +220,7 @@ __kernel void crossprod_f_dot4sum4x2(__private int input_nrow,
     
 }
 
+#if 0
 __kernel void crossprod_f_dot4sum4x4(__private int input_nrow,
                                      __private int input_ncol,
                                      __global float4* input,
@@ -1575,4 +1576,6 @@ __kernel void crossprod_f_units8d4x2_0(__private int input_nrow,
     }
     
 }
+
+#endif
 
