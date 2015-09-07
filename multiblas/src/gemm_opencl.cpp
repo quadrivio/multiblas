@@ -141,12 +141,20 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     cl_event write_eventA = nullptr;
 
     if (err == CL_SUCCESS) {
-        err = createAndWriteInput(context, queue,
-                                  nrowA, ncolA, /*row_multiple, col_multiple,
-                                  row_tile_size, col_tile_size, work_item_sizes,*/
-                                  tmA, is_float,
-                                  full_nrowA, full_ncolA, cl_input_matrixA,
-                                  fill_in_event1A, fill_in_event2A, write_eventA);
+        if (transposeA) {
+            err = createAndWriteInput(context, queue,
+                                      ncolA, nrowA,
+                                      tmA, is_float,
+                                      full_ncolA, full_nrowA, cl_input_matrixA,
+                                      fill_in_event1A, fill_in_event2A, write_eventA);
+            
+        } else {
+            err = createAndWriteInput(context, queue,
+                                      nrowA, ncolA,
+                                      tmA, is_float,
+                                      full_nrowA, full_ncolA, cl_input_matrixA,
+                                      fill_in_event1A, fill_in_event2A, write_eventA);
+        }
     }
 
     // ----- inputB -----
@@ -179,12 +187,20 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     cl_event write_eventB = nullptr;
     
     if (err == CL_SUCCESS) {
-        err = createAndWriteInput(context, queue,
-                                  nrowB, ncolB, /*row_multiple, col_multiple,
-                                  row_tile_size, col_tile_size, work_item_sizes,*/
-                                  mB, is_float,
-                                  full_nrowB, full_ncolB, cl_input_matrixB,
-                                  fill_in_event1B, fill_in_event2B, write_eventB);
+        if (transposeB) {
+            err = createAndWriteInput(context, queue,
+                                      ncolB, nrowB,
+                                      mB, is_float,
+                                      full_ncolB, full_nrowB, cl_input_matrixB,
+                                      fill_in_event1B, fill_in_event2B, write_eventB);
+            
+        } else {
+            err = createAndWriteInput(context, queue,
+                                      nrowB, ncolB,
+                                      mB, is_float,
+                                      full_nrowB, full_ncolB, cl_input_matrixB,
+                                      fill_in_event1B, fill_in_event2B, write_eventB);
+        }
     }
 
     int nrowC = transposeA ? ncolA : nrowA;
@@ -215,10 +231,10 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         if (gTrace) {
             CERR << "Initiate calculation:" << std::endl;
         }
-        cl_int cl_nrowA = (cl_int)full_nrowA;
-        cl_int cl_ncolA = (cl_int)full_ncolA;
-        cl_int cl_nrowB = (cl_int)full_nrowB;
-        cl_int cl_ncolB = (cl_int)full_ncolB;
+        cl_int cl_nrowA = transposeA ? (cl_int)full_ncolA : (cl_int)full_nrowA;
+        cl_int cl_ncolA = transposeA ? (cl_int)full_nrowA : (cl_int)full_ncolA;
+        cl_int cl_nrowB = transposeB ? (cl_int)full_ncolB : (cl_int)full_nrowB;
+        cl_int cl_ncolB = transposeB ? (cl_int)full_nrowB : (cl_int)full_ncolB;
         
         clSetKernelArg(kernel, 0, sizeof(cl_int), &cl_nrowA);
         clSetKernelArg(kernel, 1, sizeof(cl_int), &cl_ncolA);
