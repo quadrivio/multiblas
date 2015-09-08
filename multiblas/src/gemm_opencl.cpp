@@ -210,6 +210,10 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
     size_t full_ncolC = transposeB ? full_nrowB : full_ncolB;
 
     cl_mem cl_output_matrix = NULL;
+    cl_event fill_in_event1C = nullptr;
+    cl_event fill_in_event2C = nullptr;
+    cl_event write_eventC = nullptr;
+
     if (err == CL_SUCCESS) {
         if (gTrace) {
             CERR << "clCreateBuffer cl_output_vector:" << std::endl;
@@ -226,7 +230,12 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
             }
 
         } else {
-            CERR << "NOT IMPLEMENTED YET" << std::endl;
+//            CERR << "NOT IMPLEMENTED YET" << std::endl;
+            err = createAndWriteInput(context, queue,
+                                      nrowC, ncolC,
+                                      outMatrix, is_float,
+                                      full_nrowC, full_ncolC, cl_output_matrix,
+                                      fill_in_event1C, fill_in_event2C, write_eventC);
             
         }
         
@@ -270,8 +279,11 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         if (fill_in_event2A != nullptr) events.push_back(fill_in_event2A);
         if (fill_in_event1B != nullptr) events.push_back(fill_in_event1B);
         if (fill_in_event2B != nullptr) events.push_back(fill_in_event2B);
+        if (fill_in_event1C != nullptr) events.push_back(fill_in_event1C);
+        if (fill_in_event2C != nullptr) events.push_back(fill_in_event2C);
         if (write_eventA != nullptr) events.push_back(write_eventA);
         if (write_eventB != nullptr) events.push_back(write_eventB);
+        if (write_eventC != nullptr) events.push_back(write_eventC);
         cl_int event_count = (cl_int)events.size();
         
         err = clEnqueueNDRangeKernel(queue, kernel, work_dim, NULL, global_work_sizes,
