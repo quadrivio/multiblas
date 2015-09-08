@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <stdexcept>
 
 void gemm_naive_d(const double *inMatrixA, int nrowA, int ncolA, bool transposeA,
                   const double *inMatrixB, int nrowB, int ncolB, bool transposeB,
