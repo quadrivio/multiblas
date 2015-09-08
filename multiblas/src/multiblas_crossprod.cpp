@@ -162,7 +162,7 @@ SEXP crossprod_naive_C(SEXP s_x)
     
     UNPROTECT(resultUnprotectCount);
     
-    if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+    if (gTrace) CERR << endl;
     
     return(result);
 }
@@ -561,7 +561,7 @@ SEXP crossprod_clblas_C(SEXP s_device, SEXP s_x)
     
     UNPROTECT(resultUnprotectCount);
     
-    if (gTrace) CERR << /*"return " << resultUnprotectCount <<*/ endl;
+    if (gTrace) CERR << endl;
     
     return(result);
 }

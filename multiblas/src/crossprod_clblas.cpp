@@ -15,12 +15,6 @@
 #include <sstream>
 #include <vector>
 
-//#if defined(__APPLE__)
-//#include <OpenCL/opencl.h>
-//#else
-//#include <CL/opencl.h>
-//#endif
-
 const bool debug = false;
 
 ErrorStatus crossprod_clblas_d(cl_device_id device, double *inMatrix, double *outMatrix, int nrow, int ncol)
@@ -139,15 +133,6 @@ ErrorStatus crossprod_clblas(cl_device_id device, void *inMatrix, void *outMatri
     // ++++++++++++
     const clblasOrder order = clblasColumnMajor;
     const clblasTranspose transA = clblasTrans;
-//    const clblasTranspose transB = clblasNoTrans;
-//    
-//    const size_t rowsA = ncol;
-//    const size_t colsB = ncol;
-//    const size_t colsArowsB = nrow;
-    
-//    const size_t lda = nrow;
-//    const size_t ldb = nrow;
-//    const size_t ldc = ncol;
     
     const size_t lda = nrow;
     const size_t ldc = ncol;
@@ -164,12 +149,6 @@ ErrorStatus crossprod_clblas(cl_device_id device, void *inMatrix, void *outMatri
                 result << "clblasSsyrk:" << std::endl;
             }
             
-//            status = clblasSgemm(order, transA, transB, rowsA, colsB, colsArowsB,
-//                              alpha, cl_input_matrix, 0, lda,
-//                              cl_input_matrix, 0, ldb, 0.0,
-//                              cl_output_matrix, 0, ldc,
-//                              1, &queue, 0, NULL, &event);
-            
             status = clblasSsyrk(order, uplo, transA, ncol, nrow, alpha, cl_input_matrix, 0, lda, 0.0,
                                  cl_output_matrix, 0, ldc, 1, &queue, 0, NULL, &event);
             
@@ -181,12 +160,6 @@ ErrorStatus crossprod_clblas(cl_device_id device, void *inMatrix, void *outMatri
             if (debug) {
                 result << "clblasDsyrk:" << std::endl;
             }
-            
-//            status = clblasDgemm(order, transA, transB, rowsA, colsB, colsArowsB,
-//                                 alpha, cl_input_matrix, 0, ncol,
-//                                 cl_input_matrix, 0, nrow, 0.0,
-//                                 cl_output_matrix, 0, ncol,
-//                                 1, &queue, 0, NULL, &event);
             
             status = clblasDsyrk(order, uplo, transA, ncol, nrow, alpha, cl_input_matrix, 0, lda, 0.0,
                                  cl_output_matrix, 0, ldc, 1, &queue, 0, NULL, &event);
@@ -250,49 +223,6 @@ ErrorStatus crossprod_clblas(cl_device_id device, void *inMatrix, void *outMatri
 //    return status != CL_SUCCESS ? clblasErrorToString(status) : clErrorToString(err);
     return errorStatus;
 }
-
-
-//void symmetrizeSquare_f(float *x, size_t dim)
-//{
-//    if (dim > 1) {
-//        size_t rowsToCopy = dim - 1;
-//        float *startFrom = x + dim;
-//        float *to = x + 1;
-//        while (rowsToCopy > 0) {
-//            float *from = startFrom;
-//            
-//            for (size_t k = rowsToCopy; k > 0; k--) {
-//                *to++ = *from;
-//                from += dim;
-//            }
-//            
-//            rowsToCopy--;
-//            to += dim - rowsToCopy;
-//            startFrom += 1 + dim;
-//        }
-//    }
-//}
-//
-//void symmetrizeSquare_d(double *x, size_t dim)
-//{
-//    if (dim > 1) {
-//        size_t rowsToCopy = dim - 1;
-//        double *startFrom = x + dim;
-//        double *to = x + 1;
-//        while (rowsToCopy > 0) {
-//            double *from = startFrom;
-//            
-//            for (size_t k = rowsToCopy; k > 0; k--) {
-//                *to++ = *from;
-//                from += dim;
-//            }
-//            
-//            rowsToCopy--;
-//            to += dim - rowsToCopy;
-//            startFrom += 1 + dim;
-//        }
-//    }
-//}
 
 // =================================================================================================
 

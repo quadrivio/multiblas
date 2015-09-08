@@ -147,14 +147,6 @@ void transpose_d(double *x, int nrow, int ncol)
     
     memcpy(copy, x, nrow * ncol * sizeof(double));
     transpose_d(copy, nrow, ncol, x);
-//    double *q = copy;
-//    for (size_t col = 0; col < ncol; col++) {
-//        double *p = x + col;
-//        for (size_t row = 0; row < nrow; row++) {
-//            *p = *q++;
-//            p += ncol;
-//        }
-//    }
     
     free(copy);
 }

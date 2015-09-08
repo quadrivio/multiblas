@@ -72,19 +72,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         CERR << "opencl_calc_gemm( " << (is_float ? "FLOAT" : "DOUBLE") << ")" << std::endl << std::endl;
     }
     
-//    if (is_float) {
-//        for (size_t k = 0; k < nrowC * ncolC; k++) {
-//            output_matrix_f[k] = k + 0.1;
-//        }
-//        
-//    } else {
-//        for (size_t k = 0; k < nrowC * ncolC; k++) {
-//            output_matrix_d[k] = k + 0.1;
-//        }
-//    }
-//    
-//    return CL_SUCCESS;
-    
     cl_kernel kernel = is_float ? kernel_f : kernel_d;
     
     cl_int err = CL_SUCCESS;
@@ -100,17 +87,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
                       vector_size, row_multiple, row_tile_size, col_tile_size,
                       work_item_sizes);
 
-    /*
-    size_t full_nrowA = 0;
-    size_t full_ncolA = 0;
-    size_t full_ncolB = 0;
-
-    getFullSizes(full_nrowA, full_ncolA, full_ncolB, nrowA, ncolA, ncolB,
-                 vector_size, row_multiple, row_tile_size, col_tile_size, work_item_sizes);
-    
-    size_t full_nrowB = full_ncolA;
-    */
-    
     // ----- inputA -----
     
     const void *tmA = inMatrixA;
@@ -230,7 +206,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
             }
 
         } else {
-//            CERR << "NOT IMPLEMENTED YET" << std::endl;
             err = createAndWriteInput(context, queue,
                                       nrowC, ncolC,
                                       outMatrix, is_float,
@@ -273,7 +248,6 @@ cl_int opencl_calc_gemm(cl_context context, cl_kernel kernel_f, cl_kernel kernel
         cl_uint work_dim = 3;
         size_t global_work_sizes[] = { (size_t)full_ncolC / col_tile_size, (size_t)full_nrowC / row_tile_size, 1 };
         
-        //cl_event events[] = { /*fill_out_event,*/ write_event };
         std::vector<cl_event> events;
         if (fill_in_event1A != nullptr) events.push_back(fill_in_event1A);
         if (fill_in_event2A != nullptr) events.push_back(fill_in_event2A);
@@ -427,27 +401,6 @@ cl_int createAndWriteInput(cl_context context, cl_command_queue queue,
     float *input_matrix_f = (float *)inMatrix;
     double *input_matrix_d = (double *)inMatrix;
 
-    /*
-    full_nrow = row_multiple * ((nrow + row_multiple - 1) / row_multiple);
-    
-    // cheap way to find least-common-multiple; not terribly slow for small row_tile_size & col_tile_size
-    size_t gcd = col_tile_size < row_tile_size ? col_tile_size : row_tile_size;
-    while (gcd > 1 && col_tile_size % gcd != 0 && row_tile_size % gcd != 0) gcd--;
-    size_t lcm = col_tile_size * row_tile_size / gcd;
-    
-    full_ncol = (ncol + lcm - 1) / lcm;
-    
-    full_ncol = work_item_sizes[0] * ((full_ncol + work_item_sizes[0] - 1) / work_item_sizes[0]);
-    full_ncol = work_item_sizes[1] * ((full_ncol + work_item_sizes[1] - 1) / work_item_sizes[1]);
-    
-    full_ncol *= lcm;
-    full_ncol = col_multiple * ((full_ncol + col_multiple - 1) / col_multiple);
-    
-    if (gTrace) {
-        CERR << "createAndWriteInput: nrow = " << nrow << ", ncol = " << ncol << ", full_nrow = " << full_nrow << ", full_ncol = " << full_ncol << std::endl;
-    }
-    */
-    
     // buffers
     cl_input_matrix = NULL;
     if (err == CL_SUCCESS) {

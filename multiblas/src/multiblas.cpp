@@ -837,10 +837,12 @@ SEXP opencl_queue_C(SEXP s_context, SEXP s_device)
     if (gTrace) CERR << "queue = " << hex << (unsigned long long)(void *)queue << dec << endl;
     
     if (err != CL_SUCCESS) {
-//        CERR << "device = " << hex << (unsigned long long)(void *)device << dec << endl;
-//        CERR << "context = " << hex << (unsigned long long)(void *)context << dec << endl;
-//        CERR << "Device: " << getDeviceInfoString(device, CL_DEVICE_NAME) << std::endl;
-//        CERR << "Context valid: " << (isContextValid(context) ? "TRUE" : "FALSE") << std::endl;
+        if (gTrace) {
+            CERR << "device = " << hex << (unsigned long long)(void *)device << dec << endl;
+            CERR << "context = " << hex << (unsigned long long)(void *)context << dec << endl;
+            CERR << "Device: " << getDeviceInfoString(device, CL_DEVICE_NAME) << std::endl;
+            CERR << "Context valid: " << (isContextValid(context) ? "TRUE" : "FALSE") << std::endl;
+        }
         
         std::stringstream sst;
         sst << "opencl_queue_C: cannot create queue " << clErrorToString(err);
@@ -1175,10 +1177,6 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
         error("opencl_calc_x_C: wrong row_multiple class");
     }
     
-//    if (!Rf_isInteger(s_col_multiple)) {
-//        error("opencl_calc_x_C: wrong col_multiple class");
-//    }
-    
     if (!Rf_isInteger(s_row_tile_size)) {
         error("opencl_calc_x_C: wrong row_tile.size class");
     }
@@ -1278,7 +1276,6 @@ SEXP opencl_calc_x_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_qu
     filled_ncol = work_item_sizes[1] * ((filled_ncol + work_item_sizes[1] - 1) / work_item_sizes[1]);
     
     filled_ncol *= lcm;
-//    filled_ncol = col_multiple * ((filled_ncol + col_multiple - 1) / col_multiple);
 
     if (gTrace) {
         CERR << "opencl_calc_x_C: nrow = " << nrow << ", ncol = " << ncol << ", filled_nrow = " << filled_nrow << ", filled_ncol = " << filled_ncol << std::endl;
@@ -1570,12 +1567,6 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
                         SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host,
                         SEXP s_verbose)
 {
-//    SEXP flee = PROTECT(Rf_allocVector(INTSXP, 1));
-//    *INTEGER(flee) = NA_INTEGER;
-//    UNPROTECT(1);
-//    
-//    return flee;
-    
 #ifdef USE_TIMING
     steady_clock::time_point start_time = steady_clock::now();
 #endif
@@ -1884,8 +1875,6 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     size_t outRow = transposeA ? ncolA : nrowA;
     size_t outCol = transposeB ? nrowB : ncolB;
 
-//    CERR << "outRow = " << outRow << ", outCol = " << outCol << endl;
-
     SEXP result;
     PROTECT(result = Rf_allocVector(REALSXP, outRow * outCol));
     resultUnprotectCount++;
@@ -1928,11 +1917,6 @@ SEXP opencl_calc_gemm_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s
     
     size_t full_nrow_out = transposeA ? full_ncolA : full_nrowA;
     size_t full_ncol_out = transposeB ? full_nrowB : full_ncolB;
-    
-//    size_t full_nrow_out = atia_full_nrowA;
-//    size_t full_ncol_out = atia_full_ncolB;
-
-//    CERR << "full_nrow_out = " << full_nrow_out << ", full_ncol_out = " << full_ncol_out << endl;
 
     bool needsFill = nrowA != full_nrowA || ncolA != full_ncolA || nrowB != full_nrowB || ncolB != full_ncolB;
     

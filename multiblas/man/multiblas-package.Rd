@@ -9,8 +9,8 @@
 \tabular{ll}{
     Package: \tab multiblas\cr
     Type: \tab Package\cr
-    Version: \tab 0.00-1\cr
-    Date: \tab 2015-06-29\cr
+    Version: \tab 0.90-1\cr
+    Date: \tab 2015-09-08\cr
     License: \tab BSD + file LICENSE\cr
 }
     This package enables calling CPU and OpenCL BLAS libraries.

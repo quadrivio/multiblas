@@ -7,7 +7,6 @@ export(property, property.opencl.platform, property.opencl.device)
 useDynLib(multiblas, opencl_platforms_C, opencl_devices_C, property_platform_C, property_device_C)
 useDynLib(multiblas, opencl_context_C, opencl_queue_C, opencl_kernel_C, opencl_calc_x_C)
 
-# export(null.externalptr, is.externalptr.null)
 useDynLib(multiblas, null_externalptr_C, is_externalptr_null_C)
 
 useDynLib(multiblas, crossprod_naive_C, crossprod_r_C, crossprod_blas_C, crossprod_clblas_C)

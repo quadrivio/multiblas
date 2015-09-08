@@ -77,18 +77,6 @@ extern "C" {
                             SEXP s_row_tile_size, SEXP s_col_tile_size, SEXP s_fill_on_host,
                             SEXP s_verbose);
     
-//    // call from R
-//    SEXP crossprod_opencl_C(SEXP s_device, SEXP s_x, SEXP s_clblas);
-//    
-//    // call from R
-//    SEXP opencl_kernel_from_path_C(SEXP s_context, SEXP s_device, SEXP s_name, SEXP s_path);
-//    
-//    // call from R
-//    SEXP crossprod_opencl_kernel_C(SEXP s_context, SEXP s_device, SEXP s_use_float);
-//    
-//    // call from R
-//    SEXP crossprod_opencl_ckq_C(SEXP s_context, SEXP s_kernel_f, SEXP s_kernel_d, SEXP s_queue, SEXP s_x);
-    
 }
 
 #endif
