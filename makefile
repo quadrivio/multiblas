@@ -150,7 +150,7 @@ obj/utils_clblas.o: multiblas/src/utils_clblas.cpp $(HEADERS)
     -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0
 
 obj/utils.o: multiblas/src/utils.cpp $(HEADERS)
-	g++ -o obj/utils.o -c multiblas/src/utils.cpp -Imultiblas/src -DRPACKAGE=0
+	g++ -o obj/utils.o -c multiblas/src/utils.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0-0-Beta/include -DRPACKAGE=0
 
 bin/inst/crossprod_f.cl: multiblas/inst/crossprod_f.cl
 	mkdir -p bin/inst && cp multiblas/inst/crossprod_f.cl bin/inst/
