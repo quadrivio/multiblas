@@ -86,7 +86,8 @@ else
                 obj/utils.o \
                 -L/usr/lib64/openblas/lib -lopenblas \
                 -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL \
-                -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS
+                -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS \
+                -ldl
 endif
 
 obj:
