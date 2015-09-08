@@ -140,7 +140,7 @@ obj/multiblas.o: multiblas/src/multiblas.cpp $(HEADERS)
 	g++ -o obj/multiblas.o -c multiblas/src/multiblas.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0-0-Beta/include -DRPACKAGE=0 -Dnullptr='NULL'
 
 obj/opencl_info.o: multiblas/src/opencl_info.cpp $(HEADERS)
-	g++ -o obj/opencl_info.o -c multiblas/src/opencl_info.cpp -Imultiblas/src -DRPACKAGE=0 -Dnullptr='NULL'
+	g++ -o obj/opencl_info.o -c multiblas/src/opencl_info.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0-0-Beta/include -DRPACKAGE=0 -Dnullptr='NULL'
 
 obj/shim.o: multiblas/src/shim.cpp $(HEADERS)
 	g++ -o obj/shim.o -c multiblas/src/shim.cpp -Imultiblas/src -DRPACKAGE=0
