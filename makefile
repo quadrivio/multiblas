@@ -95,7 +95,7 @@ obj:
 
 obj/main.o: multiBLAS.XC/multiBLAS.XC/main.cpp $(HEADERS)
 	g++ -o obj/main.o -c multiBLAS.XC/multiBLAS.XC/main.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0-0-Beta/include \
-    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -Dnullptr='NULL' -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/multiblas_gemm.o: multiblas/src/multiblas_gemm.cpp $(HEADERS)
 	g++ -o obj/multiblas_gemm.o -c multiblas/src/multiblas_gemm.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0-0-Beta/include \
