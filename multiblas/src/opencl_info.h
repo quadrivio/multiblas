@@ -9,10 +9,10 @@
 #ifndef __template__opencl_info__
 #define __template__opencl_info__
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #include <limits.h>
-#include <cstddef>
 
 #if defined(__APPLE__)
 #include <OpenCL/opencl.h>
