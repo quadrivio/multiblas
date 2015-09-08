@@ -104,7 +104,7 @@ obj/gemm_r.o: multiblas/src/gemm_r.cpp $(HEADERS)
 	g++ -o obj/gemm_r.o -c multiblas/src/gemm_r.cpp -Imultiblas/src -DRPACKAGE=0
 
 obj/gemm_blas.o: multiblas/src/gemm_blas.cpp $(HEADERS)
-	g++ -o obj/gemm_blas.o -c multiblas/src/gemm_blas.cpp -Imultiblas/src -DRPACKAGE=0
+	g++ -o obj/gemm_blas.o -c multiblas/src/gemm_blas.cpp -Imultiblas/src -I/usr/lib64/openblas/include/ -DRPACKAGE=0
 
 obj/gemm_clblas.o: multiblas/src/gemm_clblas.cpp $(HEADERS)
 	g++ -o obj/gemm_clblas.o -c multiblas/src/gemm_clblas.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0-0-Beta/include \
