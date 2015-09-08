@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <limits.h>
+#include <cstddef>
 
 #if defined(__APPLE__)
 #include <OpenCL/opencl.h>
