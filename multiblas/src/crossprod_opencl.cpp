@@ -22,6 +22,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <cstddef>
 
 #if defined(__APPLE__)
 #include <OpenCL/opencl.h>

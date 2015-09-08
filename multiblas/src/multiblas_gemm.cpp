@@ -27,6 +27,7 @@
 #include <cctype>
 #include <cstring>
 #include <vector>
+#include <cstddef>
 
 using namespace std;
 

@@ -35,6 +35,7 @@ bool gTrace = false;    // for debugging
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <cstddef>
 
 using namespace std;
 #ifdef USE_TIMING

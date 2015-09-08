@@ -16,6 +16,7 @@
 #endif
 
 #include <cmath>
+#include <cstddef>
 #include <dlfcn.h>
 
 typedef void (*cblas_dsyrk_type)(const enum CBLAS_ORDER __Order, const enum CBLAS_UPLO __Uplo,

@@ -15,6 +15,7 @@
 #endif
 
 #include <cmath>
+#include <cstddef>
 #include <dlfcn.h>
 
 typedef void (*cblas_dgemm_type)(const enum CBLAS_ORDER __Order,
