@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include <clBLAS.h>
+#include "clBLAS.h"
 
 struct ErrorStatus {
     cl_int error;

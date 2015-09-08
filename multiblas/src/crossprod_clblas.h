@@ -15,7 +15,7 @@
 #include <CL/opencl.h>
 #endif
 
-#include <clBLAS.h>
+#include "clBLAS.h"
 #include "utils_clblas.h"
 
 ErrorStatus crossprod_clblas_d(cl_device_id device, double *inMatrix, double *outMatrix, int nrow, int ncol);

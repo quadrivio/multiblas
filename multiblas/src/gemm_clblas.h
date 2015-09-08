@@ -15,7 +15,7 @@
 #include <CL/opencl.h>
 #endif
 
-#include <clBLAS.h>
+#include "clBLAS.h"
 #include "utils_clblas.h"
 
 ErrorStatus gemm_clblas_d(cl_device_id device, const double *inMatrixA, int nrowA, int ncolA, bool transposeA,

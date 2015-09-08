@@ -66,7 +66,7 @@ int main(int argc, const char * argv[]) {
     memset(c, 0, ncolC * nrowC);
     gemm_naive_f(a, (int)nrowA, (int)ncolA, false, b, (int)nrowB, (int)ncolB, false, 1.0, 0.0, c);
     
-    cout << "gemm_naive_f result:" << endl;
+    cout << "gemm_naive_f result a * b =" << endl;
     printMatrix_f(c, ncolC, nrowC);
 
     // BLAS matrix multiplication
@@ -74,7 +74,7 @@ int main(int argc, const char * argv[]) {
     memset(c, 0, ncolC * nrowC);
     gemm_blas_f(a, (int)nrowA, (int)ncolA, false, b, (int)nrowB, (int)ncolB, false, 1.0, 0.0, c);
     
-    cout << "gemm_blas_f result:" << endl;
+    cout << "gemm_blas_f result a * b =" << endl;
     printMatrix_f(c, ncolC, nrowC);
     
     // clBLAS matrix multiplication
@@ -88,7 +88,7 @@ int main(int argc, const char * argv[]) {
     memset(c, 0, ncolC * nrowC);
     gemm_clblas_f(gpu_device, a, (int)nrowA, (int)ncolA, false, b, (int)nrowB, (int)ncolB, false, 1.0, 0.0, c);
     
-    cout << "gemm_clblas_f result:" << endl;
+    cout << "gemm_clblas_f result a * b =" << endl;
     printMatrix_f(c, 5, 2);
 
     // OpenCL matrix multiplication
@@ -125,7 +125,7 @@ int main(int argc, const char * argv[]) {
                      b, (int)nrowB, (int)ncolB, false,
                      1.0, 0.0, c, work_item_sizes, 1, 1, 1, 1, verbose);
     
-    cout << "opencl_calc_gemm result:" << endl;
+    cout << "opencl_calc_gemm result a * b =" << endl;
     printMatrix_f(c, 5, 2);
 
     // clean up
