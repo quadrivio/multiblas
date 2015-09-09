@@ -87,10 +87,10 @@ To build using the command line, `cd` to the directory containing `makefile` and
 
 ### Development Environment
 
-Max OS 10.10.5
-CentOS 6.6
+Max OS 10.10.5  
+CentOS 6.6  
 R 3.2.1  
-XCode 6.4  
+XCode 6.4   
 
 This project has not been tested or modified for Windows.
 
