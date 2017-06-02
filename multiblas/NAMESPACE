@@ -1,3 +1,5 @@
+importFrom("stats", "rnorm", "runif")
+
 export(blas.lib, print.blas.lib, multiblas.options, print.multiblas.options, print.multiblas.option)
 
 export(opencl.platforms, print.opencl.platforms, print.opencl.platform)

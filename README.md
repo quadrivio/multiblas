@@ -45,14 +45,14 @@ cd path_to_top_directory
 export PKG_CPPFLAGS="-I/usr/local/clblas/include"
 export PKG_LIBS='$(BLAS_LIBS) -framework OpenCL -L/usr/local/clblas/lib -lclBLAS'
 R CMD build multiblas
-R CMD check multiblas_0.90-1.tar.gz
+R CMD check multiblas_0.91-1.tar.gz
 
 # Linux
 cd path_to_top_directory
-export PKG_CPPFLAGS="-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0-0-Beta/include -Dnullptr='NULL' -I/opt/clBLAS-2.4.0-Linux-x64/include"
-export PKG_LIBS='$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS'
+export PKG_CPPFLAGS="-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0-0-Beta/include -Dnullptr='NULL' -I/opt/clBLAS-2.12.0-Linux-x64/include"
+export PKG_LIBS='$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.12.0-Linux-x64/lib64 -lclBLAS'
 R CMD build multiblas
-R CMD check multiblas_0.90-1.tar.gz
+R CMD check multiblas_0.91-1.tar.gz
 ```
 
 (If you download and expand the zip file, the top directory is named multiblas-master.) Then, install the package within R as follows:
@@ -62,14 +62,14 @@ R CMD check multiblas_0.90-1.tar.gz
 setwd("path_to_top_directory")
 Sys.setenv(PKG_CPPFLAGS = "-I/usr/local/clblas/include")
 Sys.setenv(PKG_LIBS = "$(BLAS_LIBS) -framework OpenCL -L/usr/local/clblas/lib/ -lclBLAS")
-install.packages("multiblas_0.90-1.tar.gz", repos = NULL, type = "source")
+install.packages("multiblas_0.91-1.tar.gz", repos = NULL, type = "source")
 library('multiblas')
 
 # Linux
 setwd("path_to_top_directory")
-Sys.setenv(PKG_CPPFLAGS = "-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0-0-Beta/include -Dnullptr='NULL' -I/opt/clBLAS-2.4.0-Linux-x64/include")
-Sys.setenv(PKG_LIBS = "$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS")
-install.packages("multiblas_0.90-1.tar.gz", repos = NULL, type = "source")
+Sys.setenv(PKG_CPPFLAGS = "-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0-0-Beta/include -Dnullptr='NULL' -I/opt/clBLAS-2.12.0-Linux-x64/include")
+Sys.setenv(PKG_LIBS = "$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.12.0-Linux-x64/lib64 -lclBLAS")
+install.packages("multiblas_0.91-1.tar.gz", repos = NULL, type = "source")
 library('multiblas')
 ```
 
@@ -87,10 +87,10 @@ To build using the command line, `cd` to the directory containing `makefile` and
 
 ### Development Environment
 
-Max OS 10.10.5  
+Max OS 10.12.5  
 CentOS 6.6  
-R 3.2.1  
-XCode 6.4   
+R 3.4.0  
+XCode 8.3.2   
 
 This project has not been tested or modified for Windows.
 

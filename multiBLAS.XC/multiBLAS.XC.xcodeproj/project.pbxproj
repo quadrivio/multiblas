@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4C5761DA1B45E3B500CEB763 /* libclBLAS.2.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */; };
 		4C61ABD21B61579400F41D23 /* gemm_blas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD01B61579400F41D23 /* gemm_blas.cpp */; };
 		4C61ABD51B616CDB00F41D23 /* multiblas_gemm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */; };
 		4C61ABD81B616E7F00F41D23 /* gemm_clblas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */; };
@@ -20,6 +19,7 @@
 		4C8CF1331B41BFE400573C31 /* opencl_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C8CF1311B41BFE400573C31 /* opencl_info.cpp */; };
 		4C8CF1361B41C08500573C31 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1351B41C08500573C31 /* OpenCL.framework */; };
 		4C8CF1381B41CCAA00573C31 /* R.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C8CF1371B41CCAA00573C31 /* R.framework */; };
+		4CCB63DE1EE1D199002DDD8D /* libclBLAS.2.12.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CCB63DD1EE1D199002DDD8D /* libclBLAS.2.12.0.dylib */; };
 		4CD4E1001B61CB2D0008D3D0 /* gemm_f.cl in Sources */ = {isa = PBXBuildFile; fileRef = 4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */; };
 		4CD4E1031B61CB690008D3D0 /* gemm_d.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */; };
 		4CD4E1041B61CB690008D3D0 /* gemm_f.cl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */; };
@@ -55,7 +55,6 @@
 /* Begin PBXFileReference section */
 		4C55152A1B4749F600F20289 /* crossprod_d.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = crossprod_d.cl; sourceTree = "<group>"; };
 		4C55152B1B4749F600F20289 /* crossprod_f.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = crossprod_f.cl; sourceTree = "<group>"; };
-		4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclBLAS.2.4.0.dylib; path = ../../../../../../usr/local/clblas/lib/libclBLAS.2.4.0.dylib; sourceTree = "<group>"; };
 		4C61ABD01B61579400F41D23 /* gemm_blas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gemm_blas.cpp; sourceTree = "<group>"; };
 		4C61ABD11B61579400F41D23 /* gemm_blas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gemm_blas.h; sourceTree = "<group>"; };
 		4C61ABD31B616CDB00F41D23 /* multiblas_gemm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiblas_gemm.cpp; sourceTree = "<group>"; };
@@ -79,6 +78,7 @@
 		4CC15C691B4C4D460091A76F /* amd sdk license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "amd sdk license.txt"; path = "../amd sdk license.txt"; sourceTree = "<group>"; };
 		4CC1B9281B434BE400F00709 /* opencl.R */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = opencl.R; sourceTree = "<group>"; };
 		4CC1B92A1B4354E200F00709 /* opencl.Rd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opencl.Rd; sourceTree = "<group>"; };
+		4CCB63DD1EE1D199002DDD8D /* libclBLAS.2.12.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libclBLAS.2.12.0.dylib; path = ../../../../../usr/local/clblas/lib/libclBLAS.2.12.0.dylib; sourceTree = "<group>"; };
 		4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = gemm_f.cl; sourceTree = "<group>"; };
 		4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = gemm_d.cl; sourceTree = "<group>"; };
 		4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_blas.cpp; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C5761DA1B45E3B500CEB763 /* libclBLAS.2.4.0.dylib in Frameworks */,
+				4CCB63DE1EE1D199002DDD8D /* libclBLAS.2.12.0.dylib in Frameworks */,
 				4CD8BB981B45BE0F00766B7E /* Accelerate.framework in Frameworks */,
 				4C8CF1361B41C08500573C31 /* OpenCL.framework in Frameworks */,
 				4C8CF1381B41CCAA00573C31 /* R.framework in Frameworks */,
@@ -134,7 +134,7 @@
 		4C8CF1341B41C06600573C31 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4C5761D91B45E3B500CEB763 /* libclBLAS.2.4.0.dylib */,
+				4CCB63DD1EE1D199002DDD8D /* libclBLAS.2.12.0.dylib */,
 				4CD8BB971B45BE0F00766B7E /* Accelerate.framework */,
 				4C8CF1371B41CCAA00573C31 /* R.framework */,
 				4C8CF1351B41C08500573C31 /* OpenCL.framework */,
@@ -297,7 +297,7 @@
 		4CF7080D1B3CD2E7009AB227 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Quadrivio Corporation";
 				TargetAttributes = {
 					4CF708141B3CD2E7009AB227 = {
@@ -365,13 +365,16 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -407,8 +410,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;

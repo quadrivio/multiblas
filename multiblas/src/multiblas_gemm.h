@@ -18,9 +18,6 @@
 #if RPACKAGE
 
 // ---------- use this block to include R headers ----------
-#ifndef NO_C_HEADERS
-#define NO_C_HEADERS
-#endif
 #include <cstdlib>
 #include <cstdio>
 #include <limits>
