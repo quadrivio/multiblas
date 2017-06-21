@@ -65,36 +65,42 @@ int main(int argc, const char * argv[]) {
     
     // Naive matrix multiplication
     
+    cout << "gemm_naive_f result a * b =" << endl;
     memset(c, 0, ncolC * nrowC);
+    
     gemm_naive_f(a, (int)nrowA, (int)ncolA, false, b, (int)nrowB, (int)ncolB, false, 1.0, 0.0, c);
     
-    cout << "gemm_naive_f result a * b =" << endl;
     printMatrix_f(c, ncolC, nrowC);
 
     // BLAS matrix multiplication
     
+    cout << "gemm_blas_f result a * b =" << endl;
     memset(c, 0, ncolC * nrowC);
+    
     gemm_blas_f(a, (int)nrowA, (int)ncolA, false, b, (int)nrowB, (int)ncolB, false, 1.0, 0.0, c);
     
-    cout << "gemm_blas_f result a * b =" << endl;
     printMatrix_f(c, ncolC, nrowC);
     
     // clBLAS matrix multiplication
-    
+ 
+    cout << "gemm_clblas_f result a * b =" << endl;
+    memset(c, 0, ncolC * nrowC);
+
     cl_platform_id platform = NULL;
     clGetPlatformIDs(1, &platform, NULL);
     
     cl_device_id gpu_device = nullptr;
     clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &gpu_device, NULL);
     
-    memset(c, 0, ncolC * nrowC);
     gemm_clblas_f(gpu_device, a, (int)nrowA, (int)ncolA, false, b, (int)nrowB, (int)ncolB, false, 1.0, 0.0, c);
     
-    cout << "gemm_clblas_f result a * b =" << endl;
     printMatrix_f(c, 5, 2);
 
     // OpenCL matrix multiplication
-    
+
+    cout << "opencl_calc_gemm result a * b =" << endl;
+    memset(c, 0, ncolC * nrowC);
+
     cl_context context = clCreateContext(NULL, 1, &gpu_device, NULL, NULL, NULL);
 
 #ifdef CL_VERSION_2_0
@@ -121,13 +127,11 @@ int main(int argc, const char * argv[]) {
 
     std::vector<size_t> work_item_sizes = { 1, 1, 1 };
 
-    memset(c, 0, ncolC * nrowC);
     opencl_calc_gemm(context, kernel_f, kernel_d, true, queue,
                      a, (int)nrowA, (int)ncolA, false,
                      b, (int)nrowB, (int)ncolB, false,
                      1.0, 0.0, c, work_item_sizes, 1, 1, 1, 1, verbose);
     
-    cout << "opencl_calc_gemm result a * b =" << endl;
     printMatrix_f(c, 5, 2);
 
     // clean up
