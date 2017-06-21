@@ -86,7 +86,7 @@ else
                 obj/utils.o \
                 -L/usr/lib64/openblas/lib -lopenblas \
                 -L/opt/AMDAPPSDK-3.0/lib/x86_64 -lOpenCL \
-                -L/opt/clBLAS-2.12.0-Linux-x64/lib64 -lclBLAS \
+                -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS \
                 -ldl
 endif
 
@@ -95,11 +95,11 @@ obj:
 
 obj/main.o: multiBLAS.XC/multiBLAS.XC/main.cpp $(HEADERS)
 	g++ -o obj/main.o -c multiBLAS.XC/multiBLAS.XC/main.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include \
-    -I/opt/clBLAS-2.12.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/multiblas_gemm.o: multiblas/src/multiblas_gemm.cpp $(HEADERS)
 	g++ -o obj/multiblas_gemm.o -c multiblas/src/multiblas_gemm.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include \
-    -I/opt/clBLAS-2.12.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/gemm_r.o: multiblas/src/gemm_r.cpp $(HEADERS)
 	g++ -o obj/gemm_r.o -c multiblas/src/gemm_r.cpp -Imultiblas/src -DRPACKAGE=0 -std=c++11
@@ -109,7 +109,7 @@ obj/gemm_blas.o: multiblas/src/gemm_blas.cpp $(HEADERS)
 
 obj/gemm_clblas.o: multiblas/src/gemm_clblas.cpp $(HEADERS)
 	g++ -o obj/gemm_clblas.o -c multiblas/src/gemm_clblas.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include \
-    -I/opt/clBLAS-2.12.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/gemm_opencl.o: multiblas/src/gemm_opencl.cpp $(HEADERS)
 	g++ -o obj/gemm_opencl.o -c multiblas/src/gemm_opencl.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include -DRPACKAGE=0 -std=c++11
@@ -119,7 +119,7 @@ obj/gemm_naive.o: multiblas/src/gemm_naive.cpp $(HEADERS)
 
 obj/multiblas_crossprod.o: multiblas/src/multiblas_crossprod.cpp $(HEADERS)
 	g++ -o obj/multiblas_crossprod.o -c multiblas/src/multiblas_crossprod.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include \
-    -I/opt/clBLAS-2.12.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/crossprod_r.o: multiblas/src/crossprod_r.cpp $(HEADERS)
 	g++ -o obj/crossprod_r.o -c multiblas/src/crossprod_r.cpp -Imultiblas/src -DRPACKAGE=0 -std=c++11
@@ -129,7 +129,7 @@ obj/crossprod_blas.o: multiblas/src/crossprod_blas.cpp $(HEADERS)
 
 obj/crossprod_clblas.o: multiblas/src/crossprod_clblas.cpp $(HEADERS)
 	g++ -o obj/crossprod_clblas.o -c multiblas/src/crossprod_clblas.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include \
-    -I/opt/clBLAS-2.12.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/crossprod_opencl.o: multiblas/src/crossprod_opencl.cpp $(HEADERS)
 	g++ -o obj/crossprod_opencl.o -c multiblas/src/crossprod_opencl.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include -DRPACKAGE=0 -std=c++11
@@ -148,7 +148,7 @@ obj/shim.o: multiblas/src/shim.cpp $(HEADERS)
 
 obj/utils_clblas.o: multiblas/src/utils_clblas.cpp $(HEADERS)
 	g++ -o obj/utils_clblas.o -c multiblas/src/utils_clblas.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include \
-    -I/opt/clBLAS-2.12.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
+    -I/opt/clBLAS-2.4.0-Linux-x64/include/ -I/usr/local/clblas/include -DRPACKAGE=0 -std=c++11
 
 obj/utils.o: multiblas/src/utils.cpp $(HEADERS)
 	g++ -o obj/utils.o -c multiblas/src/utils.cpp -Imultiblas/src -I/opt/AMDAPPSDK-3.0/include -DRPACKAGE=0 -std=c++11
