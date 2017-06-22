@@ -125,7 +125,14 @@ int main(int argc, const char * argv[]) {
 
     bool verbose = false;
 
+#if __cplusplus < 201103L
+    std::vector<size_t> work_item_sizes;
+    work_item_sizes.push_back(1);
+    work_item_sizes.push_back(1);
+    work_item_sizes.push_back(1);
+#else
     std::vector<size_t> work_item_sizes = { 1, 1, 1 };
+#endif
 
     opencl_calc_gemm(context, kernel_f, kernel_d, true, queue,
                      a, (int)nrowA, (int)ncolA, false,
