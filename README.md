@@ -2,7 +2,7 @@
 
 ---
 
-_This project is a work in progress. Documentation and testing are not complete. More discussion here: http://blog.quadrivio.com/2015/09/r-interface-to-clblas-matrix.html_
+_This project is a work in progress. Documentation and testing are not complete._
 
 ### Description
 
@@ -23,7 +23,7 @@ This project requires installation of the AMD clBLAS library.
 On OS X, the project uses the built-in Accelerate framework.
 On Linux, the project requires installation of the OpenCL and OpenBLAS libraries.
 
-See http://blog.quadrivio.com/2015/09/r-interface-to-clblas-matrix.html for installation instructions.
+See http://blog.quadrivio.com for installation instructions.
 
 ### Usage
 
