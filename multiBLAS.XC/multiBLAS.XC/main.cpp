@@ -144,12 +144,12 @@ int main(int argc, const char * argv[]) {
     // clean up
     
     free(a);
-    a = NULL;   // instead of nullptr, for max compatibility
+    a = nullptr;
     
     free(b);
-    b = NULL;   // instead of nullptr, for max compatibility
+    b = nullptr;
     
     free(c);
-    c = NULL;   // instead of nullptr, for max compatibility
+    c = nullptr;
     
 }
