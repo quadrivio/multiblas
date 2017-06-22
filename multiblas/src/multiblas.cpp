@@ -7,6 +7,7 @@
 //
 
 #include "multiblas.h"
+#include "nullptr.h"
 #include "opencl_info.h"
 #include "crossprod_opencl.h"
 #include "gemm_opencl.h"

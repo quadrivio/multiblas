@@ -7,6 +7,7 @@
 //
 
 #include "gemm_blas.h"
+#include "nullptr.h"
 
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>

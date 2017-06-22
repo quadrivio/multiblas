@@ -11,6 +11,7 @@
 #include "gemm_blas.h"
 #include "gemm_clblas.h"
 #include "gemm_opencl.h"
+#include "nullptr.h"
 #include "utils.h"
 
 #include <iostream>

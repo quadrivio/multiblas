@@ -10,6 +10,7 @@
 
 #include "gemm_opencl.h"
 #include "gemm_naive.h"
+#include "nullptr.h"
 #include "opencl_info.h"
 #include "shim.h"
 

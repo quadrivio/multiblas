@@ -79,6 +79,7 @@
 		4CC15C691B4C4D460091A76F /* amd sdk license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "amd sdk license.txt"; path = "../amd sdk license.txt"; sourceTree = "<group>"; };
 		4CC1B9281B434BE400F00709 /* opencl.R */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = opencl.R; sourceTree = "<group>"; };
 		4CC1B92A1B4354E200F00709 /* opencl.Rd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = opencl.Rd; sourceTree = "<group>"; };
+		4CC9136A1EFB4C2D00153357 /* nullptr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nullptr.h; sourceTree = "<group>"; };
 		4CD4E0FF1B61CB2D0008D3D0 /* gemm_f.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = gemm_f.cl; sourceTree = "<group>"; };
 		4CD4E1011B61CB3F0008D3D0 /* gemm_d.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = gemm_d.cl; sourceTree = "<group>"; };
 		4CD8BB8B1B45BC1000766B7E /* crossprod_blas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crossprod_blas.cpp; sourceTree = "<group>"; };
@@ -238,6 +239,7 @@
 				4CFCCF571B7CE65700402EE6 /* gemm_r.cpp */,
 				4CFCCF581B7CE65700402EE6 /* gemm_r.h */,
 				4C61ABD01B61579400F41D23 /* gemm_blas.cpp */,
+				4CC9136A1EFB4C2D00153357 /* nullptr.h */,
 				4C61ABD11B61579400F41D23 /* gemm_blas.h */,
 				4C61ABD61B616E7F00F41D23 /* gemm_clblas.cpp */,
 				4C61ABD71B616E7F00F41D23 /* gemm_clblas.h */,

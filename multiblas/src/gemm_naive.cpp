@@ -7,6 +7,7 @@
 //
 
 #include "gemm_naive.h"
+#include "nullptr.h"
 #include "shim.h"
 
 #include <cstdlib>

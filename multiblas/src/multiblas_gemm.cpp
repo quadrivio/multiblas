@@ -7,6 +7,7 @@
 //
 
 #include "multiblas_gemm.h"
+#include "nullptr.h"
 #include "opencl_info.h"
 #include "gemm_naive.h"
 #include "gemm_r.h"

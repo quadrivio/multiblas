@@ -7,6 +7,7 @@
 //
 
 #include "multiblas_crossprod.h"
+#include "nullptr.h"
 #include "opencl_info.h"
 #include "crossprod_naive.h"
 #include "crossprod_r.h"

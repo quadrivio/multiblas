@@ -8,6 +8,7 @@
 
 #include "crossprod_blas.h"
 #include "crossprod_naive.h"
+#include "nullptr.h"
 
 #if defined(__APPLE__)
 #include <Accelerate/Accelerate.h>

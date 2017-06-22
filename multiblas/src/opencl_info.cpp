@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Quadrivio Corporation. All rights reserved.
 //
 
+#include "nullptr.h"
 #include "opencl_info.h"
 #include "shim.h"
 

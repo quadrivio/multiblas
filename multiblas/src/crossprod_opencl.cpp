@@ -9,6 +9,7 @@
 #define R_NO_REMAP  // needed if include fstream
 
 #include "crossprod_opencl.h"
+#include "nullptr.h"
 #include "opencl_info.h"
 #include "shim.h"
 
