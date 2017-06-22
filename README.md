@@ -49,8 +49,8 @@ R CMD check multiblas_0.91-1.tar.gz
 
 # Linux
 cd path_to_top_directory
-export PKG_CPPFLAGS="-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0-0-Beta/include -Dnullptr='NULL' -I/opt/clBLAS-2.12.0-Linux-x64/include"
-export PKG_LIBS='$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.12.0-Linux-x64/lib64 -lclBLAS'
+export PKG_CPPFLAGS="-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0/include -Dnullptr='NULL' -I/opt/clBLAS-2.4.0-Linux-x64/include"
+export PKG_LIBS='$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS'
 R CMD build multiblas
 R CMD check multiblas_0.91-1.tar.gz
 ```
@@ -67,8 +67,8 @@ library('multiblas')
 
 # Linux
 setwd("path_to_top_directory")
-Sys.setenv(PKG_CPPFLAGS = "-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0-0-Beta/include -Dnullptr='NULL' -I/opt/clBLAS-2.12.0-Linux-x64/include")
-Sys.setenv(PKG_LIBS = "$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0-0-Beta/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.12.0-Linux-x64/lib64 -lclBLAS")
+Sys.setenv(PKG_CPPFLAGS="-I/usr/lib64/openblas/include -I/opt/AMDAPPSDK-3.0/include -Dnullptr='NULL' -I/opt/clBLAS-2.4.0-Linux-x64/include")
+Sys.setenv(PKG_LIBS = "$(BLAS_LIBS) -L/opt/AMDAPPSDK-3.0/lib/x86_64 -lOpenCL -L/opt/clBLAS-2.4.0-Linux-x64/lib64 -lclBLAS")
 install.packages("multiblas_0.91-1.tar.gz", repos = NULL, type = "source")
 library('multiblas')
 ```
@@ -88,9 +88,9 @@ To build using the command line, `cd` to the directory containing `makefile` and
 ### Development Environment
 
 Max OS 10.12.5  
-CentOS 6.6  
-R 3.4.0  
-XCode 8.3.2   
+CentOS 6.9  
+R 3.3.0  
+XCode 8.3.3   
 
 This project has not been tested or modified for Windows.
 

@@ -28,7 +28,8 @@ Returns object containing BLAS methods.
 \item{gemm}{Function gemm(A, transposeA = FALSE, B, transposeB = FALSE, C = NA, alpha = 1.0, beta = 0.0)}
 }
 \author{
-Michael Budiansky, Quadrivio Corporation
+Michael Budiansky
+quadrivio@7402.org
 }
 \examples{
 blas <- blas.lib(type="R")

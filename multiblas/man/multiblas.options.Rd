@@ -24,7 +24,8 @@
     Returns dataframe listing library options.
 }
 \author{
-    Michael Budiansky, Quadrivio Corporation
+Michael Budiansky
+quadrivio@7402.org
 }
 \examples{
     multiblas.options(type="OpenCL")

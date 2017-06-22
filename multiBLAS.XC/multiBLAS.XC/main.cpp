@@ -4,6 +4,7 @@
 //
 //  Created by michael on 6/25/15.
 //  Copyright (c) 2015 Quadrivio Corporation. All rights reserved.
+//  Copyright (c) 2017 Michael Budiansky. All rights reserved.
 //
 
 #include "opencl_info.h"

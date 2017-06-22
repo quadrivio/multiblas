@@ -10,14 +10,14 @@
     Package: \tab multiblas\cr
     Type: \tab Package\cr
     Version: \tab 0.91-1\cr
-    Date: \tab 2015-09-08\cr
+    Date: \tab 2017-06-22\cr
     License: \tab BSD + file LICENSE\cr
 }
     This package enables calling CPU and OpenCL BLAS libraries.
 }
 \author{
-    Michael Budiansky, Quadrivio Corporation
-    software@quadrivio.com
+    Michael Budiansky
+    quadrivio@7402.org
 }
 
 \keyword{package}

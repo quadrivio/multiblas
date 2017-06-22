@@ -35,7 +35,8 @@
 \item{...}{other stuff}
 }
 \author{
-Michael Budiansky, Quadrivio Corporation
+Michael Budiansky
+quadrivio@7402.org
 }
 
 \keyword{multiblas}

@@ -2,10 +2,10 @@ Package: multiblas
 Type: Package
 Title: Project multiblas
 Version: 0.91-1
-Date: 2015-09-09
+Date: 2017-06-22
 Author: Michael Budiansky
-Copyright: Quadrivio Corporation
-Maintainer: <software@quadrivio.com>
+Copyright: Michael Budiansky
+Maintainer: <quadrivio@7402.org>
 Description: A project to compare routines for matrix operations on CPU and AMD GPU processors.
 License: BSD_2_clause + file LICENSE
 SystemRequirements: OpenCL library
